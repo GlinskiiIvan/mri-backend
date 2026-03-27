@@ -18,6 +18,8 @@ import { PostsModule } from './posts/posts.module';
 import { Post } from './posts/entities/post.entity';
 import { DoctorModule } from './doctor/doctor.module';
 import { Doctor } from './doctor/entities/doctor.entity';
+import { PatientModule } from './patient/patient.module';
+import { Patient } from './patient/entities/patient.entity';
 
 @Module({
   imports: [
@@ -37,6 +39,7 @@ import { Doctor } from './doctor/entities/doctor.entity';
         UserRoles, 
         Post,
         Doctor,
+        Patient
       ],
       autoLoadModels: true,
     }),
@@ -56,6 +59,7 @@ import { Doctor } from './doctor/entities/doctor.entity';
     FilesModule,
     PostsModule,
     DoctorModule,
+    PatientModule,
   ],
   controllers: [AppController],
   providers: [

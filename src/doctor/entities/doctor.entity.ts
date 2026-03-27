@@ -5,10 +5,12 @@ import {
   DataType,
   DeletedAt,
   ForeignKey,
+  HasMany,
   Model,
   Table,
 } from 'sequelize-typescript';
 import { Gender } from 'src/common/enums';
+import { Patient } from 'src/patient/entities/patient.entity';
 import { User } from 'src/users/entities/user.entity';
 
 interface TableCreationAttrs {
@@ -111,4 +113,8 @@ export class Doctor extends Model<Doctor, TableCreationAttrs> {
   @DeletedAt
   @Column({ type: DataType.DATE, allowNull: true })
   declare deletedAt?: Date | null;
+
+  // Один доктор — много пациентов
+  @HasMany(() => Patient)
+  patients: Patient[];
 }
