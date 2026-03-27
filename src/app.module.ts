@@ -1,0 +1,69 @@
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { ConfigModule } from '@nestjs/config';
+import { UsersModule } from './users/users.module';
+import { User } from './users/entities/user.entity';
+import { RolesModule } from './roles/roles.module';
+import { Role } from './roles/entities/role.entity';
+import { UserRoles } from './intermediary-tables/user-roles.entity';
+import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './guards/auth.guard';
+import { FilesModule } from './files/files.module';
+import * as path from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { PostsModule } from './posts/posts.module';
+import { Post } from './posts/entities/post.entity';
+import { DoctorModule } from './doctor/doctor.module';
+import { Doctor } from './doctor/entities/doctor.entity';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: `.${process.env.NODE_ENV}.env`,
+    }),
+    SequelizeModule.forRoot({
+      dialect: 'postgres',
+      host: process.env.POSTGRES_HOST,
+      port: Number(process.env.POSTGRES_PORT),
+      username: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_DB,
+      models: [
+        User, 
+        Role, 
+        UserRoles, 
+        Post,
+        Doctor,
+      ],
+      autoLoadModels: true,
+    }),
+    ServeStaticModule.forRoot(
+      {
+        rootPath: path.join(__dirname, '..', 'static', 'document'),
+        renderPath: '/document',
+      },
+      {
+        rootPath: path.join(__dirname, '..', 'static', 'image'),
+        renderPath: '/image',
+      },
+    ),
+    UsersModule,
+    RolesModule,
+    AuthModule,
+    FilesModule,
+    PostsModule,
+    DoctorModule,
+  ],
+  controllers: [AppController],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    AppService,
+  ],
+})
+export class AppModule {}
