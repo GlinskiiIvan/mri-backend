@@ -1,0 +1,78 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { StudyService } from './study.service';
+import { CreateStudyDto } from './dto/create-study.dto';
+import { UpdateStudyDto } from './dto/update-study.dto';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/decorators/roles.decorator';
+import { Study } from './entities/study.entity';
+import { RolesGuard } from 'src/guards/roles.guard';
+
+@ApiBearerAuth('token')
+@ApiTags('Исследование')
+@Controller('study')
+export class StudyController {
+  constructor(private readonly studyService: StudyService) {}
+
+  @ApiOperation({ summary: 'Создание исследования' })
+  @ApiResponse({ status: 200, type: Study })
+  @Roles('admin', 'doctor')
+  @UseGuards(RolesGuard)
+  @Post()
+  create(@Body() dto: CreateStudyDto) {
+    return this.studyService.create(dto);
+  }
+
+  @ApiOperation({ summary: 'Получение всех исследований' })
+  @ApiResponse({ status: 200, type: [Study] })
+  @Roles('admin', 'doctor')
+  @UseGuards(RolesGuard)
+  @Get()
+  findAll() {
+    return this.studyService.findAll();
+  }
+
+  @ApiOperation({ summary: 'Получение исследования по id' })
+  @ApiResponse({ status: 200, type: Study })
+  @Roles('admin', 'doctor')
+  @UseGuards(RolesGuard)
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.studyService.findOne(+id);
+  }
+
+  @ApiOperation({ summary: 'Обновление исследования' })
+  @ApiResponse({ status: 200, type: Study })
+  @Roles('admin', 'doctor')
+  @UseGuards(RolesGuard)
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() dto: UpdateStudyDto) {
+    return this.studyService.update(+id, dto);
+  }
+
+  @ApiOperation({ summary: 'Восстановление исследования после мягкого удаления' })
+  @ApiResponse({ status: 200, type: Boolean })
+  @Roles('admin', 'doctor')
+  @UseGuards(RolesGuard)
+  @Patch(':id/restore')
+  restore(@Param('id') id: string) {
+    return this.studyService.restore(+id);
+  }
+
+  @ApiOperation({ summary: 'Мягкое удаление исследования' })
+  @ApiResponse({ status: 200, type: Boolean })
+  @Roles('admin', 'doctor')
+  @UseGuards(RolesGuard)
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.studyService.remove(+id);
+  }
+
+  @ApiOperation({ summary: 'Жесткое удаление исследования' })
+  @ApiResponse({ status: 200, type: Boolean })
+  @Roles('admin', 'doctor')
+  @UseGuards(RolesGuard)
+  @Delete(':id/force')
+  forceRemove(@Param('id') id: string) {
+    return this.studyService.forceRemove(+id);
+  }
+}

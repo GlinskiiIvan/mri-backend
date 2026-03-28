@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { Patient } from './entities/patient.entity';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
+import { Study } from 'src/study/entities/study.entity';
 
 @ApiBearerAuth('token')
 @ApiTags('Пациент')
@@ -40,6 +41,15 @@ export class PatientController {
     return this.patientService.findOne(+id);
   }
 
+  @ApiOperation({ summary: 'Получение всех исследований пациента по id' })
+  @ApiResponse({ status: 200, type: [Study] })
+  @Roles('admin', 'doctor')
+  @UseGuards(RolesGuard)
+  @Get(':id/studies')
+  findAllStudies(@Param('id') id: string) {
+    return this.patientService.findAllStudies(+id);
+  }
+
   @ApiOperation({ summary: 'Обновление пациента' })
   @ApiResponse({ status: 200, type: Patient })
   @Roles('admin', 'doctor')
@@ -47,6 +57,15 @@ export class PatientController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdatePatientDto) {
     return this.patientService.update(+id, dto);
+  }
+
+  @ApiOperation({ summary: 'Восстановление пациента по id после мягкого удаления' })
+  @ApiResponse({ status: 200, type: Boolean })
+  @Roles('admin', 'doctor')
+  @UseGuards(RolesGuard)
+  @Patch(':id/restore')
+  restore(@Param('id') id: string) {
+    return this.patientService.restore(+id);
   }
 
   @ApiOperation({ summary: 'Мягкое удаление пациента по id' })
@@ -65,14 +84,5 @@ export class PatientController {
   @Delete(':id/force')
   forceRemove(@Param('id') id: string) {
     return this.patientService.forceRemove(+id);
-  }
-
-  @ApiOperation({ summary: 'Восстановление пациента по id после мягкого удаления' })
-  @ApiResponse({ status: 200, type: Boolean })
-  @Roles('admin', 'doctor')
-  @UseGuards(RolesGuard)
-  @Patch(':id/restore')
-  restore(@Param('id') id: string) {
-    return this.patientService.restore(+id);
   }
 }

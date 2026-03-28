@@ -1,7 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { BelongsTo, Column, DataType, DeletedAt, ForeignKey, Model, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, DeletedAt, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
 import { Gender } from "src/common/enums";
 import { Doctor } from "src/doctor/entities/doctor.entity";
+import { Study } from "src/study/entities/study.entity";
 
 interface TableCreationAttrs {
     doctorId: number;
@@ -50,15 +51,19 @@ export class Patient extends Model<Patient, TableCreationAttrs> {
     phone: string;
 
     @ApiProperty({ example: 'doctor@mail.ru', description: 'Email для связи', required: false, })
-    @Column({ type: DataType.STRING, allowNull: false, })
+    @Column({ type: DataType.STRING, allowNull: true, })
     email?: string;
 
     @ApiProperty({ example: 'Странные колени', description: 'Заметка', required: false, })
-    @Column({ type: DataType.STRING, allowNull: false })
+    @Column({ type: DataType.STRING, allowNull: true })
     note?: string;
 
     @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата удаления', })
     @DeletedAt
     @Column({ type: DataType.DATE, allowNull: true, defaultValue: null })
-    declare deletedAt: Date | null;
+    declare deletedAt?: Date | null;
+
+    // Один пациент - много исследований
+    @HasMany(() => Study)
+    studies: Study[];
 }

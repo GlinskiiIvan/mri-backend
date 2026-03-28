@@ -20,6 +20,8 @@ import { DoctorModule } from './doctor/doctor.module';
 import { Doctor } from './doctor/entities/doctor.entity';
 import { PatientModule } from './patient/patient.module';
 import { Patient } from './patient/entities/patient.entity';
+import { StudyModule } from './study/study.module';
+import { Study } from './study/entities/study.entity';
 
 @Module({
   imports: [
@@ -39,7 +41,8 @@ import { Patient } from './patient/entities/patient.entity';
         UserRoles, 
         Post,
         Doctor,
-        Patient
+        Patient,
+        Study
       ],
       autoLoadModels: true,
     }),
@@ -60,6 +63,7 @@ import { Patient } from './patient/entities/patient.entity';
     PostsModule,
     DoctorModule,
     PatientModule,
+    StudyModule,
   ],
   controllers: [AppController],
   providers: [
