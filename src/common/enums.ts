@@ -28,3 +28,8 @@ export enum Protocol {
   T2 = 'T2',
   PD = 'PD',
 }
+
+export enum ResultClass {
+  Normal = 'normal',
+  Tear = 'tear',
+}

@@ -6,12 +6,15 @@ import { PredictionRun } from './entities/prediction-run.entity';
 import { SeriesService } from 'src/series/series.service';
 import { Series } from 'src/series/entities/series.entity';
 import { Doctor } from 'src/doctor/entities/doctor.entity';
+import { DoctorService } from 'src/doctor/doctor.service';
+import { Prediction } from 'src/prediction/entities/prediction.entity';
 
 @Injectable()
 export class PredictionRunService {
   constructor(
     @InjectModel(PredictionRun) private repository: typeof PredictionRun,
     private seriesServise: SeriesService,
+    private doctorServise: DoctorService,
   ) {}
 
   private attributesModel = [];
@@ -23,10 +26,18 @@ export class PredictionRunService {
     model: Doctor,
     as: 'createdBy',
   }
+  private includePredictions = {
+    model: Prediction,
+    as: 'predictions',
+  }
     
   async create(dto: CreatePredictionRunDto) {
     try {
+      await this.seriesServise.findOneOrThrow(dto.seriesId);
+      await this.doctorServise.findOneOrThrow(dto.createdById);
+
       const run = await this.repository.create(dto);
+      
       return run;
     } catch (error) {
         const msg = `Ошибка при создании запуска предсказания. ${error.message}`;
@@ -40,6 +51,19 @@ export class PredictionRunService {
       return await this.repository.findAll();
     } catch (error) {
         const msg = `Ошибка при получении всех запусков предсказания. ${error.message}`;
+        console.log(msg);
+        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findAllPredictions(id: number) {
+    try {
+      const run = await this.repository.findByPk(id, {
+        include: [this.includePredictions],
+      });
+      return run.predictions;
+    } catch (error) {
+        const msg = `Ошибка при получении всех предсказаний запуска предсказания по id. ${error.message}`;
         console.log(msg);
         throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }

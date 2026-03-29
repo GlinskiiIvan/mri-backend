@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { PredictionRun } from './entities/prediction-run.entity';
+import { Prediction } from 'src/prediction/entities/prediction.entity';
 
 @ApiBearerAuth('token')
 @ApiTags('Запуск предсказания')
@@ -38,6 +39,15 @@ export class PredictionRunController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.predictionRunService.findOne(+id);
+  }
+
+  @ApiOperation({ summary: 'Получение всех предсказаний запуска предсказания по id' })
+  @ApiResponse({ status: 200, type: [Prediction] })
+  @Roles('admin', 'doctor')
+  @UseGuards(RolesGuard)
+  @Get(':id/predictions')
+  findAllPredictions(@Param('id') id: string) {
+    return this.predictionRunService.findAllPredictions(+id);
   }
 
   @ApiOperation({ summary: 'Обновление запуска предсказания' })

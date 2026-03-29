@@ -26,6 +26,8 @@ import { SeriesModule } from './series/series.module';
 import { Series } from './series/entities/series.entity';
 import { PredictionRunModule } from './prediction-run/prediction-run.module';
 import { PredictionRun } from './prediction-run/entities/prediction-run.entity';
+import { PredictionModule } from './prediction/prediction.module';
+import { Prediction } from './prediction/entities/prediction.entity';
 
 @Module({
   imports: [
@@ -49,6 +51,7 @@ import { PredictionRun } from './prediction-run/entities/prediction-run.entity';
         Study,
         Series,
         PredictionRun,
+        Prediction,
       ],
       autoLoadModels: true,
     }),
@@ -72,6 +75,7 @@ import { PredictionRun } from './prediction-run/entities/prediction-run.entity';
     StudyModule,
     SeriesModule,
     PredictionRunModule,
+    PredictionModule,
   ],
   controllers: [AppController],
   providers: [
