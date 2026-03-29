@@ -62,9 +62,9 @@ export class Doctor extends Model<Doctor, TableCreationAttrs> {
   birthDate: Date;
 
   @ApiProperty({
-    example: 'male',
+    example: Gender.Male,
     description: 'Пол',
-    enum: ['male', 'female'],
+    enum: Object.values(Gender),
   })
   @Column({ type: DataType.ENUM(...Object.values(Gender)), allowNull: false })
   gender: Gender;

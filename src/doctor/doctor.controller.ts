@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { Doctor } from './entities/doctor.entity';
+import { Patient } from 'src/patient/entities/patient.entity';
 
 @ApiBearerAuth('token')
 @ApiTags('Доктор')
@@ -38,6 +39,15 @@ export class DoctorController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.doctorService.findOne(+id);
+  }
+
+  @ApiOperation({ summary: 'Получение всех пациентов доктора по id' })
+  @ApiResponse({ status: 200, type: [Patient] })
+  @Roles('admin')
+  @UseGuards(RolesGuard)
+  @Get(':id/patients')
+  findAllPatients(@Param('id') id: string) {
+    return this.doctorService.findAllPatients(+id);
   }
 
   @ApiOperation({ summary: 'Обновление доктора по id' })

@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Doctor } from './entities/doctor.entity';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/entities/user.entity';
+import { Patient } from 'src/patient/entities/patient.entity';
 
 @Injectable()
 export class DoctorService {
@@ -14,25 +15,28 @@ export class DoctorService {
   ) {}
 
   private attributesModel = [];
-  private includeModels = [
-    {
-      model: User,
-      as: 'user',
-      attributes: ['id', 'email'],
-    },
-  ];
+  private includeUser = {
+    model: User,
+    as: 'user',
+    attributes: ['id', 'email'],
+  };
+  private includePatients = {
+    model: Patient,
+    as: 'patients',
+  };
 
   async create(dto: CreateDoctorDto) {
     try {
-      const user = await this.userService.findOneOrThrow(dto.userId);
+      await this.userService.findOneOrThrow(dto.userId);
       const doctor = await this.repository.create({
         ...dto,
         birthDate: new Date(dto.birthDate),
       });
       return doctor;
     } catch (error) {
-      console.log(error);
-      throw new HttpException(`Ошибка при создании доктора. ${error.message}`, error.status || HttpStatus.BAD_REQUEST);
+      const msg = `Ошибка при создании доктора. ${error.message}`;
+      console.log(msg);
+      throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -40,20 +44,35 @@ export class DoctorService {
     try {
       return await this.repository.findAll();
     } catch (error) {
-      console.log(error);
-      throw new HttpException(`Ошибка при получении всех докторов. ${error.message}`, error.status || HttpStatus.BAD_REQUEST);
+      const msg = `Ошибка при получении всех докторов. ${error.message}`;
+      console.log(msg);
+      throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findAllPatients(id: number) {
+    try {
+      const doctor = await this.repository.findByPk(id, {
+        include: [this.includePatients]
+      })
+      return doctor.patients;
+    } catch (error) {
+      const msg = `Ошибка при получении всех докторов. ${error.message}`;
+      console.log(msg);
+      throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }
   }
 
   async findOne(id: number) {
     try {
       const doctor = await this.repository.findByPk(id, {
-        include: this.includeModels
+        include: [this.includeUser]
       })
       return doctor;
     } catch (error) {
-      console.log(error);
-      throw new HttpException(`Ошибка при получении доктора по id. ${error.message}`, error.status || HttpStatus.BAD_REQUEST);
+      const msg = `Ошибка при получении доктора по id. ${error.message}`;
+      console.log(msg);
+      throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -78,8 +97,9 @@ export class DoctorService {
 
       return updatedRows[0];
     } catch (error) {
-      console.log(error);
-      throw new HttpException(`Ошибка при обновлении доктора. ${error.message}`, error.status || HttpStatus.BAD_REQUEST);
+      const msg = `Ошибка при обновлении доктора. ${error.message}`;
+      console.log(msg);
+      throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -89,19 +109,20 @@ export class DoctorService {
       await this.repository.destroy({where: {id}});
       return true;
     } catch (error) {
-      console.log(error);
-      throw new HttpException(`Ошибка при мягком удалении доктора. ${error.message}`, error.status || HttpStatus.BAD_REQUEST);
+      const msg = `Ошибка при мягком удалении доктора. ${error.message}`;
+      console.log(msg);
+      throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }
   }
 
   async forceRemove(id: number) {
     try {
-      await this.findOneOrThrow(id);
       await this.repository.destroy({where: {id}, force: true});
       return true;
     } catch (error) {
-      console.log(error);
-      throw new HttpException(`Ошибка при жестком удалении доктора. ${error.message}`, error.status || HttpStatus.BAD_REQUEST);
+      const msg = `Ошибка при жестком удалении доктора. ${error.message}`;
+      console.log(msg);
+      throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -110,8 +131,9 @@ export class DoctorService {
       await this.repository.restore({where: {id}});
       return true;
     } catch (error) {
-      console.log(error);
-      throw new HttpException(`Ошибка при востановлении доктора после мягкого удаления. ${error.message}`, error.status || HttpStatus.BAD_REQUEST);
+      const msg = `Ошибка при востановлении доктора после мягкого удаления. ${error.message}`;
+      console.log(msg);
+      throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }
   }
 }
