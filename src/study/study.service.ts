@@ -6,6 +6,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Study } from './entities/study.entity';
 import { PatientService } from 'src/patient/patient.service';
 import { Status } from 'src/common/enums';
+import { Series } from 'src/series/entities/series.entity';
 
 @Injectable()
 export class StudyService {
@@ -19,6 +20,10 @@ export class StudyService {
     model: Patient,
     as: 'patient',
     attributes: ['id', 'fullName'],
+  }
+  private includeSeries = {
+    model: Series,
+    as: 'series',
   }
 
   async create(dto: CreateStudyDto) {
@@ -48,6 +53,19 @@ export class StudyService {
       return studies;
     } catch (error) {
         const msg = `Ошибка при получении всех исследований. ${error.message}`;
+        console.log(msg);
+        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findAllSeries(id: number) {
+    try {
+      const study = await this.repository.findByPk(id, {
+        include: [this.includeSeries]
+      })
+      return study.series;
+    } catch (error) {
+        const msg = `Ошибка при получении всех серий исследования по id. ${error.message}`;
         console.log(msg);
         throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }

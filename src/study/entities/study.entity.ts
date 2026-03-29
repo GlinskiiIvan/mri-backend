@@ -1,7 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { BelongsTo, Column, DataType, DeletedAt, ForeignKey, Model, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, DeletedAt, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
 import { Modality, Status } from "src/common/enums";
 import { Patient } from "src/patient/entities/patient.entity";
+import { Series } from "src/series/entities/series.entity";
 
 interface TableCreationAttrs {
     patientId: number;
@@ -57,4 +58,8 @@ export class Study extends Model<Study, TableCreationAttrs> {
     @DeletedAt
     @Column({ type: DataType.DATE, allowNull: true, defaultValue: null })
     declare deletedAt?: Date | null;
+
+    // Одно исследование — много серий
+    @HasMany(() => Series)
+    series: Series[];
 }

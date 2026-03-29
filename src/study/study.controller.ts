@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { Roles } from 'src/decorators/roles.decorator';
 import { Study } from './entities/study.entity';
 import { RolesGuard } from 'src/guards/roles.guard';
+import { Series } from 'src/series/entities/series.entity';
 
 @ApiBearerAuth('token')
 @ApiTags('Исследование')
@@ -38,6 +39,15 @@ export class StudyController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.studyService.findOne(+id);
+  }
+
+  @ApiOperation({ summary: 'Получение всех серий исследования по id' })
+  @ApiResponse({ status: 200, type: [Series] })
+  @Roles('admin', 'doctor')
+  @UseGuards(RolesGuard)
+  @Get(':id/series')
+  findAllSeries(@Param('id') id: string) {
+    return this.studyService.findAllSeries(+id);
   }
 
   @ApiOperation({ summary: 'Обновление исследования' })
