@@ -15,13 +15,11 @@ export class StudyService {
   ) {}
 
   private attributesModel = [];
-  private includeModels = [
-    {
-      model: Patient,
-      as: 'patient',
-      attributes: ['id', 'fullName'],
-    },
-  ];
+  private includePatient = {
+    model: Patient,
+    as: 'patient',
+    attributes: ['id', 'fullName'],
+  }
 
   async create(dto: CreateStudyDto) {
     try {
@@ -68,7 +66,7 @@ export class StudyService {
   async findOne(id: number) {
     try {
       const study = await this.repository.findByPk(id, {
-        include: this.includeModels
+        include: [this.includePatient]
       });
       return study; 
     } catch (error) {

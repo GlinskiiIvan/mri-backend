@@ -15,13 +15,15 @@ export class PatientService {
   ) {}
 
   private attributesModel = [];
-  private includeModels = [
-    {
-      model: Doctor,
-      as: 'doctor',
-      attributes: ['id', 'fullName'],
-    }
-  ];
+  private includeDoctor = {
+    model: Doctor,
+    as: 'doctor',
+    attributes: ['id', 'fullName'],
+  }
+  private includeStudies = {
+    model: Study, 
+    as: 'studies'
+  }
 
   async create(dto: CreatePatientDto) {
     try {
@@ -50,6 +52,20 @@ export class PatientService {
     }
   }
 
+  async findAllStudies(id: number) {
+    try {
+      const patient = await this.repository.findByPk(id, {
+        include: [this.includeStudies],
+      });
+
+      return patient.studies;
+    } catch (error) {
+        const msg = `Ошибка при получении всех исследований пациента. ${error.message}`;
+        console.log(msg);
+        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST)
+    }
+  }
+
   async findOneOrThrow(id: number) {
     const patient = await this.repository.findByPk(id);
 
@@ -63,26 +79,12 @@ export class PatientService {
   async findOne(id: number) {
     try {
       const patient = await this.repository.findByPk(id, {
-        include: this.includeModels,
+        include: [this.includeDoctor],
       });
 
       return patient;
     } catch (error) {
         const msg = `Ошибка при получении пациента. ${error.message}`;
-        console.log(msg);
-        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST)
-    }
-  }
-
-  async findAllStudies(id: number) {
-    try {
-      const patient = await this.repository.findByPk(id, {
-        include: [{model: Study, as: 'studies'}],
-      });
-
-      return patient.studies;
-    } catch (error) {
-        const msg = `Ошибка при получении всех исследований пациента. ${error.message}`;
         console.log(msg);
         throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST)
     }
