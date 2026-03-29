@@ -6,6 +6,7 @@ import { Series } from './entities/series.entity';
 import { StudyService } from 'src/study/study.service';
 import { Study } from 'src/study/entities/study.entity';
 import { Status } from 'src/common/enums';
+import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
 
 @Injectable()
 export class SeriesService {
@@ -18,6 +19,10 @@ export class SeriesService {
   private includeStudy = {
     model: Study,
     as: 'study',
+  }
+  private includeRuns = {
+    model: PredictionRun,
+    as: 'runs',
   }
     
   async create(dto: CreateSeriesDto) {
@@ -45,6 +50,19 @@ export class SeriesService {
       return await this.repository.findAll();
     } catch (error) {
         const msg = `Ошибка при получении всех серий. ${error.message}`;
+        console.log(msg);
+        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findAllRuns(id: number) {
+    try {
+      const series = await this.repository.findByPk(id, {
+        include: [this.includeRuns],
+      })
+      return series.runs;
+    } catch (error) {
+        const msg = `Ошибка при получении серии по id. ${error.message}`;
         console.log(msg);
         throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }

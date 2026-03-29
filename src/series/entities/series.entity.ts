@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { BelongsTo, Column, DataType, DeletedAt, ForeignKey, Model, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, DeletedAt, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
 import { Modality, Orientation, Protocol, Status } from "src/common/enums";
+import { PredictionRun } from "src/prediction-run/entities/prediction-run.entity";
 import { Study } from "src/study/entities/study.entity";
 
 interface TableCreationAttrs {
@@ -81,4 +82,7 @@ export class Series extends Model<Series, TableCreationAttrs> {
     @DeletedAt
     @Column({ type: DataType.DATE, allowNull: true, defaultValue: null, })
     declare deletedAt?: Date | null;
+
+    @HasMany(() => PredictionRun)
+    runs: PredictionRun[];
 }
