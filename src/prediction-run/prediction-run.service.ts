@@ -8,6 +8,7 @@ import { Series } from 'src/series/entities/series.entity';
 import { Doctor } from 'src/doctor/entities/doctor.entity';
 import { DoctorService } from 'src/doctor/doctor.service';
 import { Prediction } from 'src/prediction/entities/prediction.entity';
+import { FindOptions, Includeable } from 'sequelize';
 
 @Injectable()
 export class PredictionRunService {
@@ -18,18 +19,11 @@ export class PredictionRunService {
   ) {}
 
   private attributesModel = [];
-  private includeSeries = {
-    model: Series,
-    as: 'series',
-  }
-  private includeCreatedBy = {
-    model: Doctor,
-    as: 'createdBy',
-  }
-  private includePredictions = {
+
+  private includePredictions: Includeable = {
     model: Prediction,
     as: 'predictions',
-  }
+  };
     
   async create(dto: CreatePredictionRunDto) {
     try {
@@ -37,7 +31,6 @@ export class PredictionRunService {
       await this.doctorServise.findOneOrThrow(dto.createdById);
 
       const run = await this.repository.create(dto);
-      
       return run;
     } catch (error) {
         const msg = `Ошибка при создании запуска предсказания. ${error.message}`;
@@ -58,7 +51,7 @@ export class PredictionRunService {
 
   async findAllPredictions(id: number) {
     try {
-      const run = await this.repository.findByPk(id, {
+      const run = await this.findOneOrThrow(id, {
         include: [this.includePredictions],
       });
       return run.predictions;
@@ -69,23 +62,17 @@ export class PredictionRunService {
     }
   }
 
-  async findOneOrThrow(id: number) {
-    const run = await this.repository.findByPk(id, {
-      include: [this.includeSeries, this.includeCreatedBy],
-    })
-
+  async findOneOrThrow(id: number, options?: Omit<FindOptions<PredictionRun>, "where">) {
+    const run = await this.repository.findByPk(id, options);
     if(!run) {
       throw new HttpException(`Запуск предсказания не найден.`, HttpStatus.NOT_FOUND);
     }
-
     return run;
   }
 
   async findOne(id: number) {
     try {
-      const run = await this.repository.findByPk(id, {
-        include: [this.includeSeries, this.includeCreatedBy],
-      })
+      const run = await this.findOneOrThrow(id);
       return run;
     } catch (error) {
         const msg = `Ошибка при получении запуска предсказания по id. ${error.message}`;
@@ -97,10 +84,27 @@ export class PredictionRunService {
   async update(id: number, dto: UpdatePredictionRunDto) {
     try {
       await this.findOneOrThrow(id);
-      const [_, updatedRows] = await this.repository.update(dto, {where: {id}, returning: true});
+      const [_, updatedRows] = await this.repository.update(
+        dto, 
+        {
+          where: {id}, 
+          returning: true
+        }
+      );
       return updatedRows[0];
     } catch (error) {
         const msg = `Ошибка при обновлении запуска предсказания. ${error.message}`;
+        console.log(msg);
+        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async restore(id: number) {
+    try {
+      await this.repository.restore({where: {id}});
+      return true;
+    } catch (error) {
+        const msg = `Ошибка при восстановлении запуска предсказания после мягкого удаления. ${error.message}`;
         console.log(msg);
         throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }
@@ -124,17 +128,6 @@ export class PredictionRunService {
       return true;
     } catch (error) {
         const msg = `Ошибка при жестком удалении запуска предсказания. ${error.message}`;
-        console.log(msg);
-        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  async restore(id: number) {
-    try {
-      await this.repository.restore({where: {id}});
-      return true;
-    } catch (error) {
-        const msg = `Ошибка при восстановлении запуска предсказания после мягкого удаления. ${error.message}`;
         console.log(msg);
         throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }

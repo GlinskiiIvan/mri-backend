@@ -5,10 +5,10 @@ import { Prediction } from "src/prediction/entities/prediction.entity";
 import { Series } from "src/series/entities/series.entity";
 
 interface TableCreationAttrs {
-    seriesId: number;
-    createdById: number;
-    model: string;
-    version: string;
+    readonly seriesId: number;
+    readonly createdById: number;
+    readonly model: string;
+    readonly version: string;
 }
 @Table({ tableName: 'prediction_run', paranoid: true })
 export class PredictionRun extends Model<PredictionRun, TableCreationAttrs> {
@@ -44,7 +44,7 @@ export class PredictionRun extends Model<PredictionRun, TableCreationAttrs> {
     @Column({ type: DataType.STRING, })
     version: string;
 
-    @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата удаления', })
+    @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата удаления', required: false })
     @DeletedAt
     @Column({ type: DataType.DATE, allowNull: true, defaultValue: null, })
     declare deletedAt?: Date | null;
