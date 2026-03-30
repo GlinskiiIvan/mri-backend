@@ -6,6 +6,7 @@ import { Patient } from './entities/patient.entity';
 import { DoctorService } from 'src/doctor/doctor.service';
 import { Doctor } from 'src/doctor/entities/doctor.entity';
 import { Study } from 'src/study/entities/study.entity';
+import { FindOptions, Includeable } from 'sequelize';
 
 @Injectable()
 export class PatientService {
@@ -15,15 +16,17 @@ export class PatientService {
   ) {}
 
   private attributesModel = [];
-  private includeDoctor = {
+
+  private includeDoctor: Includeable = {
     model: Doctor,
     as: 'doctor',
     attributes: ['id', 'fullName'],
-  }
-  private includeStudies = {
+  };
+
+  private includeStudies: Includeable = {
     model: Study, 
     as: 'studies'
-  }
+  };
 
   async create(dto: CreatePatientDto) {
     try {
@@ -54,7 +57,7 @@ export class PatientService {
 
   async findAllStudies(id: number) {
     try {
-      const patient = await this.repository.findByPk(id, {
+      const patient = await this.findOneOrThrow(id, {
         include: [this.includeStudies],
       });
 
@@ -66,22 +69,19 @@ export class PatientService {
     }
   }
 
-  async findOneOrThrow(id: number) {
+  async findOneOrThrow(id: number, options?: Omit<FindOptions<Patient>, "where">) {
     const patient = await this.repository.findByPk(id);
-
     if(!patient) {
       throw new HttpException(`Пациент не найден.`, HttpStatus.NOT_FOUND)
     }
-
     return patient;
   }
 
   async findOne(id: number) {
     try {
-      const patient = await this.repository.findByPk(id, {
+      const patient = await this.findOneOrThrow(id, {
         include: [this.includeDoctor],
       });
-
       return patient;
     } catch (error) {
         const msg = `Ошибка при получении пациента. ${error.message}`;
@@ -94,8 +94,14 @@ export class PatientService {
     try {
       await this.findOneOrThrow(id);
       const [_, updatedRows] = await this.repository.update(
-        {...dto, birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined},
-        {where: {id}, returning: true}
+        {
+          ...dto, 
+          birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined
+        },
+        {
+          where: {id}, 
+          returning: true
+        }
       );
       return updatedRows[0];
     } catch (error) {
