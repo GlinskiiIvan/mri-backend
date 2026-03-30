@@ -48,13 +48,13 @@ export class Prediction extends Model<Prediction, TableCreationAttrs> {
     @Column({ type: DataType.ENUM(...Object.values(ResultClass)), })
     resultClass: ResultClass;
 
-    @ApiProperty({ example: 0.97, description: 'Максимальная точность', required: false })
+    @ApiProperty({ example: 0.97, description: 'Максимальная точность', required: false, })
     @Column({ type: DataType.FLOAT, allowNull: true, defaultValue: null, })
-    maxConfidence?: number;
+    maxConfidence?: number | null;
 
-    @ApiProperty({ example: 0.89, description: 'Минимальная точность', required: false })
+    @ApiProperty({ example: 0.89, description: 'Минимальная точность', required: false, })
     @Column({ type: DataType.FLOAT, allowNull: true, defaultValue: null, })
-    minConfidence?: number;
+    minConfidence?: number | null;
 
     @ApiProperty({
         example: [
@@ -79,11 +79,11 @@ export class Prediction extends Model<Prediction, TableCreationAttrs> {
     @Column({ type: DataType.DATE, })
     startedAt: Date;
 
-    @ApiProperty({ example: '2026-03-27T16:00:01.000Z', description: 'Дата завершения', required: false })
+    @ApiProperty({ example: '2026-03-27T16:00:01.000Z', description: 'Дата завершения', required: false, })
     @Column({ type: DataType.DATE, allowNull: true, defaultValue: null, })
-    finishedAt?: Date;
+    finishedAt?: Date | null;
 
-    @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата удаления', required: false })
+    @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата удаления', required: false, })
     @DeletedAt
     @Column({ type: DataType.DATE, allowNull: true, defaultValue: null, })
     declare deletedAt?: Date | null;

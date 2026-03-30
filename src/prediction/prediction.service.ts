@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Prediction } from './entities/prediction.entity';
 import { PredictionRunService } from 'src/prediction-run/prediction-run.service';
 import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
+import { FindOptions, Includeable } from 'sequelize';
 
 @Injectable()
 export class PredictionService {
@@ -14,7 +15,8 @@ export class PredictionService {
   ) {}
 
   private attributesModel = [];
-  private includeRun= {
+
+  private includeRun: Includeable = {
     model: PredictionRun,
     as: 'run',
   }
@@ -46,23 +48,19 @@ export class PredictionService {
     }
   }
 
-  async findOneOrThrow(id: number) {
-    const prediction = await this.repository.findByPk(id, {
-      include: [this.includeRun],
-    })
-
+  async findOneOrThrow(id: number, options?: Omit<FindOptions<Prediction>, "where">) {
+    const prediction = await this.repository.findByPk(id, options);
     if(!prediction) {
       throw new HttpException(`Предсказание не найдено.`, HttpStatus.NOT_FOUND);
     }
-
     return prediction;
   }
 
   async findOne(id: number) {
     try {
-      const prediction = await this.repository.findByPk(id, {
+      const prediction = await this.findOneOrThrow(id, {
         include: [this.includeRun],
-      })
+      });
       return prediction;
     } catch (error) {
         const msg = `Ошибка при получении предсказания по id. ${error.message}`;
