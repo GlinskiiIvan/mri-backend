@@ -78,7 +78,7 @@ export class UsersService {
     }
   }
 
-  async findOneOrThrow(id: number, options?: Omit<FindOptions<Role>, "where">) {
+  async findOneOrThrow(id: number, options?: Omit<FindOptions<User>, "where">) {
     const user = await this.repository.findByPk(id, options);
     if (!user) {
       throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);

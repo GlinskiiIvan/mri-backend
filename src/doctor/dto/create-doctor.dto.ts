@@ -13,21 +13,21 @@ import { Gender } from 'src/common/enums';
 export class CreateDoctorDto {
   @ApiProperty({ example: 1, description: 'Уникальный ID пользователя' })
   @IsNumber({}, { message: 'Должно быть числом' })
-  userId: number;
+  readonly userId: number;
 
   @ApiProperty({
     example: 'Глинский Иван Николаевич',
     description: 'Полное имя',
   })
   @IsString({ message: 'Должно быть строкой' })
-  fullName: string;
+  readonly fullName: string;
 
   @ApiProperty({ example: '1894-10-04', description: 'Дата рождения' })
   @IsDateString(
     {},
     { message: 'Должно быть корректной датой в формате YYYY-MM-DD' },
   )
-  birthDate: string;
+  readonly birthDate: string;
 
   @ApiProperty({
     example: 'male',
@@ -35,11 +35,11 @@ export class CreateDoctorDto {
     enum: ['male', 'female'],
   })
   @IsEnum(Gender, { message: 'Должно быть одним из опредленных значений' })
-  gender: Gender;
+  readonly gender: Gender;
 
   @ApiProperty({ example: '+77714563464', description: 'Номер телефона' })
   @IsPhoneNumber('KZ', { message: 'Некорректный номер телефона' })
-  phone: string;
+  readonly phone: string;
 
   @ApiProperty({
     example: 'doctor@mail.ru',
@@ -48,15 +48,15 @@ export class CreateDoctorDto {
   })
   @IsOptional()
   @IsEmail({}, { message: 'Некорректный email' })
-  contactEmail?: string;
+  readonly contactEmail?: string;
 
   @ApiProperty({ example: 'Ортопедия', description: 'Специализация' })
   @IsString({ message: 'Должно быть строкой' })
-  specialization: string;
+  readonly specialization: string;
 
   @ApiProperty({ example: 'Хирургическое', description: 'Отделение' })
   @IsString({ message: 'Должно быть строкой' })
-  department: string;
+  readonly department: string;
 
   @ApiProperty({
     example: 'KN-202345',
@@ -65,7 +65,7 @@ export class CreateDoctorDto {
   })
   @IsOptional()
   @IsString({ message: 'Должно быть строкой' })
-  licenseNumber?: string;
+  readonly licenseNumber?: string;
 
   @ApiProperty({
     example: 'Опыт работы 10 лет, специализация на коленных операциях',
@@ -74,5 +74,5 @@ export class CreateDoctorDto {
   })
   @IsOptional()
   @IsString({ message: 'Должно быть строкой' })
-  note?: string;
+  readonly note?: string;
 }
