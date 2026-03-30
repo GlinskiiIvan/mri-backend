@@ -70,7 +70,7 @@ export class PatientService {
   }
 
   async findOneOrThrow(id: number, options?: Omit<FindOptions<Patient>, "where">) {
-    const patient = await this.repository.findByPk(id);
+    const patient = await this.repository.findByPk(id, options);
     if(!patient) {
       throw new HttpException(`Пациент не найден.`, HttpStatus.NOT_FOUND)
     }

@@ -5,13 +5,13 @@ import { Patient } from "src/patient/entities/patient.entity";
 import { Series } from "src/series/entities/series.entity";
 
 interface TableCreationAttrs {
-    patientId: number;
-    studyDate: Date;
-    modality: Modality;
-    description?: string;
-    status: Status;
-    path: string;
-    note?: string;
+    readonly patientId: number;
+    readonly studyDate: Date;
+    readonly modality: Modality;
+    readonly description?: string;
+    readonly status: Status;
+    readonly path: string;
+    readonly note?: string;
 }
 
 @Table({ tableName: 'study', paranoid: true })
@@ -31,16 +31,16 @@ export class Study extends Model<Study, TableCreationAttrs> {
     patient: Patient;
 
     @ApiProperty({ example: '2026-03-27 15:05:29.277 +0600', description: 'Дата прохождения исследования' })
-    @Column({ type: DataType.DATE, allowNull: false })
+    @Column({ type: DataType.DATE, })
     studyDate: Date;
 
-    @ApiProperty({ example: 'MR', description: 'Модальность исследования', enum: Object.values(Modality), })
+    @ApiProperty({ example: Modality.MR, description: 'Модальность исследования', enum: Object.values(Modality), })
     @Column({ type: DataType.ENUM(...Object.values(Modality)), })
     modality: Modality;
 
     @ApiProperty({ example: 'Представим, что это описание всего исследования.', description: 'Описание', required: false, })
-    @Column({ type: DataType.STRING, allowNull: true })
-    description?: string;
+    @Column({ type: DataType.STRING, allowNull: true, defaultValue: null })
+    description?: string | null;
 
     @ApiProperty({ example: Status.Completed, description: 'Статус', enum: Object.values(Status), })
     @Column({ type: DataType.ENUM(...Object.values(Status)), defaultValue: Status.Pending })
@@ -51,8 +51,8 @@ export class Study extends Model<Study, TableCreationAttrs> {
     path: string;
 
     @ApiProperty({ example: 'Странные колени', description: 'Заметка', required: false, })
-    @Column({ type: DataType.STRING, allowNull: true })
-    note?: string;
+    @Column({ type: DataType.STRING, allowNull: true, defaultValue: null })
+    note?: string | null;
 
     @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата удаления', })
     @DeletedAt
