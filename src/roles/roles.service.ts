@@ -4,7 +4,7 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Role } from './entities/role.entity';
 import { User } from 'src/users/entities/user.entity';
-import { FindOptions } from 'sequelize';
+import { FindOptions, Includeable } from 'sequelize';
 
 @Injectable()
 export class RolesService {
@@ -12,7 +12,7 @@ export class RolesService {
     @InjectModel(Role) private repository: typeof Role
   ) {}
 
-  private includeUsers= {
+  private includeUsers: Includeable = {
     model: User,
     as: 'users',
   }

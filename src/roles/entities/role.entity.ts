@@ -4,8 +4,8 @@ import { UserRoles } from 'src/intermediary-tables/user-roles.entity';
 import { User } from 'src/users/entities/user.entity';
 
 interface TableCreationAttrs {
-  value: string;
-  description: string;
+  readonly value: string;
+  readonly description: string;
 }
 
 @Table({ tableName: 'roles', paranoid: true })
