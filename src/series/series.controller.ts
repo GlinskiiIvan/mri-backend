@@ -19,8 +19,8 @@ export class SeriesController {
   @Roles('admin', 'doctor')
   @UseGuards(RolesGuard)
   @Post()
-  create(@Body() createSeriesDto: CreateSeriesDto) {
-    return this.seriesService.create(createSeriesDto);
+  create(@Body() dto: CreateSeriesDto) {
+    return this.seriesService.create(dto);
   }
 
   @ApiOperation({ summary: 'Получение всех серий' })
@@ -55,8 +55,8 @@ export class SeriesController {
   @Roles('admin', 'doctor')
   @UseGuards(RolesGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSeriesDto: UpdateSeriesDto) {
-    return this.seriesService.update(+id, updateSeriesDto);
+  update(@Param('id') id: string, @Body() dto: UpdateSeriesDto) {
+    return this.seriesService.update(+id, dto);
   }
 
   @ApiOperation({ summary: 'Восстановление серии после мягкого удаления' })

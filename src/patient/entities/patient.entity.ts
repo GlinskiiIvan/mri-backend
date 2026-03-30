@@ -58,7 +58,7 @@ export class Patient extends Model<Patient, TableCreationAttrs> {
     @Column({ type: DataType.STRING, allowNull: true, defaultValue: null, })
     note?: string | null;
 
-    @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата удаления', })
+    @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата удаления', required: false, })
     @DeletedAt
     @Column({ type: DataType.DATE, allowNull: true, defaultValue: null })
     declare deletedAt?: Date | null;

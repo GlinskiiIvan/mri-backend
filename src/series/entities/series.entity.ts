@@ -5,20 +5,20 @@ import { PredictionRun } from "src/prediction-run/entities/prediction-run.entity
 import { Study } from "src/study/entities/study.entity";
 
 interface TableCreationAttrs {
-    studyId: number;
-    seriesNumber: string;
-    modality: Modality;
-    protocol: Protocol;
-    orientation?: Orientation;
-    imagesCount: number;
-    rawMetadata: JSON;
-    path: string;
-    status: Status;
-    description?: string;
+    readonly studyId: number;
+    readonly seriesNumber: string;
+    readonly modality: Modality;
+    readonly protocol: Protocol;
+    readonly orientation?: Orientation;
+    readonly imagesCount: number;
+    readonly rawMetadata: JSON;
+    readonly path: string;
+    readonly status: Status;
+    readonly description?: string;
 }
 @Table({ tableName: 'series', paranoid: true })
 export class Series extends Model<Series, TableCreationAttrs> {
-    @ApiProperty({ example: 1, description: 'Уникальный ID исследования' })
+    @ApiProperty({ example: 1, description: 'Уникальный ID серии' })
     @Column({ type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true, })
     id: number;
 
@@ -41,12 +41,12 @@ export class Series extends Model<Series, TableCreationAttrs> {
     modality: Modality;
 
     @ApiProperty({ example: Protocol.PD, description: 'Протокол серии', enum: Object.values(Protocol), required: false, })
-    @Column({ type: DataType.ENUM(...Object.values(Protocol)), allowNull: true, })
-    protocol?: Protocol;
+    @Column({ type: DataType.ENUM(...Object.values(Protocol)), allowNull: true, defaultValue: null, })
+    protocol?: Protocol | null;
     
     @ApiProperty({ example: Orientation.Sagittal, description: 'Ориентация серии', enum: Object.values(Orientation), required: false, })
-    @Column({ type: DataType.ENUM(...Object.values(Orientation)), allowNull: true, })
-    orientation?: Orientation;
+    @Column({ type: DataType.ENUM(...Object.values(Orientation)), allowNull: true, defaultValue: null, })
+    orientation?: Orientation | null;
 
     @ApiProperty({ example: 13, description: 'Количество снимков в серии', })
     @Column({ type: DataType.INTEGER, })
@@ -61,12 +61,12 @@ export class Series extends Model<Series, TableCreationAttrs> {
             bodyPartExamined: "KNEE",
             manufacturer: "Siemens",
         },
-        description: 'Сырые метаданные исследования (например, данные из DICOM: UID исследования, количество серий и снимков, модальность, область исследования и оборудование)',
+        description: 'Сырые метаданные серии (например, данные из DICOM: UID исследования, количество снимков, модальность, область исследования и оборудование)',
     })
     @Column({ type: DataType.JSONB, })
     rawMetadata: JSON;
 
-    @ApiProperty({ example: '/patient_{id}/study_{id}/series_{id}', description: 'Путь до директории с снимками серии', })
+    @ApiProperty({ example: '/patient_{id}/study_{id}/series_{id}', description: 'Путь до директории со снимками серии', })
     @Column({ type: DataType.STRING, })
     path: string;
 
@@ -75,10 +75,10 @@ export class Series extends Model<Series, TableCreationAttrs> {
     status: Status;
 
     @ApiProperty({ example: 'Представим, что это описание всего исследования.', description: 'Описание', required: false, })
-    @Column({ type: DataType.STRING, allowNull: true, })
-    description?: string;
+    @Column({ type: DataType.STRING, allowNull: true, defaultValue: null, })
+    description?: string | null;
 
-    @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата удаления', })
+    @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата удаления', required: false, })
     @DeletedAt
     @Column({ type: DataType.DATE, allowNull: true, defaultValue: null, })
     declare deletedAt?: Date | null;

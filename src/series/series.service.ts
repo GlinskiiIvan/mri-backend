@@ -7,6 +7,7 @@ import { StudyService } from 'src/study/study.service';
 import { Study } from 'src/study/entities/study.entity';
 import { Status } from 'src/common/enums';
 import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
+import { FindOptions, Includeable } from 'sequelize';
 
 @Injectable()
 export class SeriesService {
@@ -16,14 +17,11 @@ export class SeriesService {
   ) {}
 
   private attributesModel = [];
-  private includeStudy = {
-    model: Study,
-    as: 'study',
-  }
-  private includeRuns = {
+  
+  private includeRuns: Includeable = {
     model: PredictionRun,
     as: 'runs',
-  }
+  };
     
   async create(dto: CreateSeriesDto) {
     try {
@@ -57,9 +55,9 @@ export class SeriesService {
 
   async findAllRuns(id: number) {
     try {
-      const series = await this.repository.findByPk(id, {
+      const series = await this.findOneOrThrow(id, {
         include: [this.includeRuns],
-      })
+      });
       return series.runs;
     } catch (error) {
         const msg = `Ошибка при получении серии по id. ${error.message}`;
@@ -68,8 +66,8 @@ export class SeriesService {
     }
   }
 
-  async findOneOrThrow(id: number) {
-    const series = await this.repository.findByPk(id);
+  async findOneOrThrow(id: number, options?: Omit<FindOptions<Series>, "where">) {
+    const series = await this.repository.findByPk(id, options);
 
     if(!series) {
       throw new HttpException(`Серия не найдена.`, HttpStatus.NOT_FOUND);
@@ -80,9 +78,7 @@ export class SeriesService {
 
   async findOne(id: number) {
     try {
-      const series = await this.repository.findByPk(id, {
-        include: [this.includeStudy],
-      })
+      const series = await this.findOneOrThrow(id);
       return series;
     } catch (error) {
         const msg = `Ошибка при получении серии по id. ${error.message}`;
@@ -94,10 +90,26 @@ export class SeriesService {
   async update(id: number, dto: UpdateSeriesDto) {
     try {
       await this.findOneOrThrow(id);
-      const [_, updatedRows] = await this.repository.update(dto, {where: {id}, returning: true});
+      const [_, updatedRows] = await this.repository.update(dto, 
+        {
+          where: {id}, 
+          returning: true
+        }
+      );
       return updatedRows[0];
     } catch (error) {
         const msg = `Ошибка при обновлении серии. ${error.message}`;
+        console.log(msg);
+        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async restore(id: number) {
+    try {
+      await this.repository.restore({where: {id}});
+      return true;
+    } catch (error) {
+        const msg = `Ошибка при восстановлении серии после мягкого удаления. ${error.message}`;
         console.log(msg);
         throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }
@@ -121,17 +133,6 @@ export class SeriesService {
       return true;
     } catch (error) {
         const msg = `Ошибка при жестком удалении серии. ${error.message}`;
-        console.log(msg);
-        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  async restore(id: number) {
-    try {
-      await this.repository.restore({where: {id}});
-      return true;
-    } catch (error) {
-        const msg = `Ошибка при восстановлении серии после мягкого удаления. ${error.message}`;
         console.log(msg);
         throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }

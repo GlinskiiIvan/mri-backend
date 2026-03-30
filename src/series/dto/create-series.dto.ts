@@ -38,7 +38,7 @@ export class CreateSeriesDto {
         bodyPartExamined: "KNEE",
         manufacturer: "Siemens",
         },
-        description: 'Сырые метаданные исследования (например, данные из DICOM: UID исследования, количество серий и снимков, модальность, область исследования и оборудование)',
+        description: 'Сырые метаданные серии (например, данные из DICOM: UID исследования, количество снимков, модальность, область исследования и оборудование)',
     })
     @IsObject({ message: 'rawMetadata должно быть объектом' })
     readonly rawMetadata: JSON;
