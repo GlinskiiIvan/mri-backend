@@ -1,19 +1,17 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BelongsTo, Column, DataType, DeletedAt, ForeignKey, Model, Table } from "sequelize-typescript";
 import { ResultClass, Status } from "src/common/enums";
+import { InstanceImage } from "src/instance-image/entities/instance-image.entity";
 import { PredictionRun } from "src/prediction-run/entities/prediction-run.entity";
 import { BBox } from "src/types";
 
 interface TableCreationAttrs {
     readonly runId: number;
-    readonly imageName: string;
-    readonly imagePath: string;
-    readonly status: Status;
+    readonly imageId: number;
     readonly resultClass: ResultClass;
     readonly maxConfidence?: number;
     readonly minConfidence?: number;
     readonly rawOutput: JSON[];
-    readonly startedAt: Date;
 }
 
 @Table({ tableName: 'prediction', paranoid: true })
@@ -32,13 +30,15 @@ export class Prediction extends Model<Prediction, TableCreationAttrs> {
     @BelongsTo(() => PredictionRun)
     run: PredictionRun;
 
-    @ApiProperty({ example: '00005-dd5595a4.png', description: 'Название изображения' })
-    @Column({ type: DataType.STRING, unique: true })
-    imageName: string;
+    // Внешний ключ укзаывающий на изображение
+    @ApiProperty({ example: 1, description: 'Уникальный ID изображения' })
+    @ForeignKey(() => InstanceImage)
+    @Column({ type: DataType.INTEGER, })
+    imageId: number;
 
-    @ApiProperty({ example: '/patient_{id}/study_{id}/series_{id}/00005-dd5595a4.png', description: 'Путь до изображения' })
-    @Column({ type: DataType.STRING, unique: true })
-    imagePath: string;
+    // alias для изображения
+    @BelongsTo(() => InstanceImage)
+    image: InstanceImage;
 
     @ApiProperty({ example: Status.Pending, description: 'Статус обработки', enum: Object.values(Status), })
     @Column({ type: DataType.ENUM(...Object.values(Status)), defaultValue: Status.Pending })
@@ -74,14 +74,6 @@ export class Prediction extends Model<Prediction, TableCreationAttrs> {
     })
     @Column({ type: DataType.JSONB, })
     rawOutput: JSON[];
-
-    @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата запуска', })
-    @Column({ type: DataType.DATE, })
-    startedAt: Date;
-
-    @ApiProperty({ example: '2026-03-27T16:00:01.000Z', description: 'Дата завершения', required: false, })
-    @Column({ type: DataType.DATE, allowNull: true, defaultValue: null, })
-    finishedAt?: Date | null;
 
     @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата удаления', required: false, })
     @DeletedAt

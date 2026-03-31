@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsString } from "class-validator";
+import { IsDateString, IsNumber, IsString } from "class-validator";
 
 export class CreatePredictionRunDto {
     @ApiProperty({ example: 1, description: 'Уникальный ID серии' })

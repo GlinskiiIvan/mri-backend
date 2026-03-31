@@ -7,6 +7,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { Series } from './entities/series.entity';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
+import { InstanceImage } from 'src/instance-image/entities/instance-image.entity';
 
 @ApiBearerAuth('token')
 @ApiTags('Серия')
@@ -48,6 +49,15 @@ export class SeriesController {
   @Get(':id/runs')
   findAllRuns(@Param('id') id: string) {
     return this.seriesService.findAllRuns(+id);
+  }
+
+  @ApiOperation({ summary: 'Получение всех изображений серии по id' })
+  @ApiResponse({ status: 200, type: [InstanceImage] })
+  @Roles('admin', 'doctor')
+  @UseGuards(RolesGuard)
+  @Get(':id/images')
+  findAllImages(@Param('id') id: string) {
+    return this.seriesService.findAllImages(+id);
   }
 
   @ApiOperation({ summary: 'Обновление серии' })

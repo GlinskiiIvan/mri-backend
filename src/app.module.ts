@@ -28,6 +28,8 @@ import { PredictionRunModule } from './prediction-run/prediction-run.module';
 import { PredictionRun } from './prediction-run/entities/prediction-run.entity';
 import { PredictionModule } from './prediction/prediction.module';
 import { Prediction } from './prediction/entities/prediction.entity';
+import { InstanceImageModule } from './instance-image/instance-image.module';
+import { InstanceImage } from './instance-image/entities/instance-image.entity';
 
 @Module({
   imports: [
@@ -52,6 +54,7 @@ import { Prediction } from './prediction/entities/prediction.entity';
         Series,
         PredictionRun,
         Prediction,
+        InstanceImage,
       ],
       autoLoadModels: true,
     }),
@@ -76,6 +79,7 @@ import { Prediction } from './prediction/entities/prediction.entity';
     SeriesModule,
     PredictionRunModule,
     PredictionModule,
+    InstanceImageModule,
   ],
   controllers: [AppController],
   providers: [

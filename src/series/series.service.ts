@@ -8,6 +8,7 @@ import { Study } from 'src/study/entities/study.entity';
 import { Status } from 'src/common/enums';
 import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
 import { FindOptions, Includeable } from 'sequelize';
+import { InstanceImage } from 'src/instance-image/entities/instance-image.entity';
 
 @Injectable()
 export class SeriesService {
@@ -22,17 +23,19 @@ export class SeriesService {
     model: PredictionRun,
     as: 'runs',
   };
+
+  private includeImages: Includeable = {
+    model: InstanceImage,
+    as: 'images',
+  };
     
   async create(dto: CreateSeriesDto) {
     try {
       const study = await this.studyServise.findOneOrThrow(dto.studyId);
 
-      const series = await this.repository.create({
-        ...dto,
-        status: Status.Pending
-      });
+      const series = await this.repository.create(dto);
 
-      series.path = `/patient_${study.patientId}/study_${study.id}/series_${series.id}`;
+      series.path = `${study.path}/series_${series.id}`;
       series.save();
 
       return series;
@@ -60,7 +63,20 @@ export class SeriesService {
       });
       return series.runs;
     } catch (error) {
-        const msg = `Ошибка при получении серии по id. ${error.message}`;
+        const msg = `Ошибка при получении всех запусков предсказаний серии по id. ${error.message}`;
+        console.log(msg);
+        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findAllImages(id: number) {
+    try {
+      const series = await this.findOneOrThrow(id, {
+        include: [this.includeImages],
+      });
+      return series.images;
+    } catch (error) {
+        const msg = `Ошибка при получении всех изображений серии по id. ${error.message}`;
         console.log(msg);
         throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }

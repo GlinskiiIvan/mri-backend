@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BelongsTo, Column, DataType, DeletedAt, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
+import { Status } from "src/common/enums";
 import { Doctor } from "src/doctor/entities/doctor.entity";
 import { Prediction } from "src/prediction/entities/prediction.entity";
 import { Series } from "src/series/entities/series.entity";
@@ -43,6 +44,10 @@ export class PredictionRun extends Model<PredictionRun, TableCreationAttrs> {
     @ApiProperty({ example: '8l', description: 'Версия' })
     @Column({ type: DataType.STRING, })
     version: string;
+
+    @ApiProperty({ example: Status.Pending, description: 'Статус обработки', enum: Object.values(Status), })
+    @Column({ type: DataType.ENUM(...Object.values(Status)), defaultValue: Status.Pending })
+    status: Status;
 
     @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата удаления', required: false })
     @DeletedAt

@@ -8,9 +8,9 @@ export class CreatePredictionDto {
     @IsNumber({}, { message: 'runId должен быть числом' })
     readonly runId: number;
 
-    @ApiProperty({ example: '00005-dd5595a4.png', description: 'Название изображения' })
-    @IsString({ message: 'imageName должно быть строкой' })
-    readonly imageName: string;
+    @ApiProperty({ example: 1, description: 'Уникальный ID изображения' })
+    @IsNumber({}, { message: 'imageId должен быть числом' })
+    readonly imageId: number;
 
     @ApiProperty({ example: ResultClass.Tear, description: 'Класс', enum: Object.values(ResultClass), })
     @IsEnum(ResultClass, { message: `resultClass должн быть одним из значений: ${Object.values(ResultClass).join(', ')}` })
@@ -44,8 +44,4 @@ export class CreatePredictionDto {
     })
     @IsArray({ message: 'rawOutput должно быть массивом' })
     readonly rawOutput: JSON[];
-
-    @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата запуска', })
-    @IsDateString({}, { message: 'startedAt должна быть корректной датой в формате ISO 8601 (например, 2026-03-27T15:05:29.277+06:00)', })
-    readonly startedAt: string;
 }

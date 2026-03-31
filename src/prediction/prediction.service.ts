@@ -25,10 +25,7 @@ export class PredictionService {
     try {
       await this.predictionRunService.findOneOrThrow(dto.runId);
 
-      const prediction = await this.repository.create({
-        ...dto,
-        startedAt: new Date(dto.startedAt),
-      });
+      const prediction = await this.repository.create(dto);
 
       return prediction;
     } catch (error) {
@@ -72,11 +69,7 @@ export class PredictionService {
   async update(id: number, dto: UpdatePredictionDto) {
     try {
       await this.findOneOrThrow(id);
-      const [_, updatedRows] = await this.repository.update({
-        ...dto,
-        startedAt: dto.startedAt ? new Date(dto.startedAt) : undefined,
-        finishedAt: dto.finishedAt ? new Date(dto.finishedAt) : undefined,
-      }, {where: {id}, returning: true});
+      const [_, updatedRows] = await this.repository.update(dto, {where: {id}, returning: true});
       return updatedRows[0];
     } catch (error) {
         const msg = `Ошибка при обновлении предсказания. ${error.message}`;

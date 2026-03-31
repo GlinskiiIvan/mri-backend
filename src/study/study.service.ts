@@ -34,7 +34,6 @@ export class StudyService {
       const study = await this.repository.create({
         ...dto, 
         studyDateTime: new Date(dto.studyDateTime),
-        status: Status.Pending,
       });
 
       study.path = `/patient_${dto.patientId}/study_${study.id}`;

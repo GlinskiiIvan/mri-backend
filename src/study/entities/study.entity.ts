@@ -16,8 +16,9 @@ interface TableCreationAttrs {
     readonly studyDateTime: Date;
     readonly modality: Modality;
     readonly description?: string;
-    readonly status: Status;
     readonly path: string;
+    readonly seriesCount: number;
+    readonly imagesCount: number;
     readonly note?: string;
 }
 
@@ -88,6 +89,14 @@ export class Study extends Model<Study, TableCreationAttrs> {
     @ApiProperty({ example: '/patient_{id}/study_{id}/', description: 'Путь до директории с сериями исследования', })
     @Column({ type: DataType.STRING, })
     path: string;
+
+    @ApiProperty({ example: 5, description: 'Количество серий в исследовании', })
+    @Column({ type: DataType.INTEGER, })
+    seriesCount: number;
+
+    @ApiProperty({ example: 5, description: 'Количество изображений в исследовании', })
+    @Column({ type: DataType.INTEGER, })
+    imagesCount: number;
 
     @ApiProperty({ example: 'Странные колени', description: 'Заметка', required: false, })
     @Column({ type: DataType.STRING, allowNull: true, defaultValue: null })

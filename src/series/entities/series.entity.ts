@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BelongsTo, Column, DataType, DeletedAt, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
 import { Modality, Orientation, Protocol, Status } from "src/common/enums";
+import { InstanceImage } from "src/instance-image/entities/instance-image.entity";
 import { PredictionRun } from "src/prediction-run/entities/prediction-run.entity";
 import { Study } from "src/study/entities/study.entity";
 
@@ -13,7 +14,6 @@ interface TableCreationAttrs {
     readonly imagesCount: number;
     readonly rawMetadata: JSON;
     readonly path: string;
-    readonly status: Status;
     readonly description?: string;
 }
 @Table({ tableName: 'series', paranoid: true })
@@ -85,4 +85,7 @@ export class Series extends Model<Series, TableCreationAttrs> {
 
     @HasMany(() => PredictionRun)
     runs: PredictionRun[];
+
+    @HasMany(() => InstanceImage)
+    images: InstanceImage[];
 }

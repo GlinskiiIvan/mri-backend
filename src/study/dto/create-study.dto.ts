@@ -63,4 +63,12 @@ export class CreateStudyDto {
     @IsOptional()
     @IsString({ message: 'referringPhysiciansName должно быть строкой' })
     readonly referringPhysiciansName?: string | null;
+
+    @ApiProperty({ example: 5, description: 'Количество серий в исследовании', })
+    @IsNumber({}, { message: 'seriesCount должно быть числом' })
+    seriesCount: number;
+
+    @ApiProperty({ example: 5, description: 'Количество изображений в исследовании', })
+    @IsNumber({}, { message: 'imagesCount должно быть числом' })
+    imagesCount: number;
 }
