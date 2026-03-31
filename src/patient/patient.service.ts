@@ -79,9 +79,7 @@ export class PatientService {
 
   async findOne(id: number) {
     try {
-      const patient = await this.findOneOrThrow(id, {
-        include: [this.includeDoctor],
-      });
+      const patient = await this.findOneOrThrow(id);
       return patient;
     } catch (error) {
         const msg = `Ошибка при получении пациента. ${error.message}`;

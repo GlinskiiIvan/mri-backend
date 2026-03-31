@@ -33,7 +33,7 @@ export class StudyService {
 
       const study = await this.repository.create({
         ...dto, 
-        studyDate: new Date(dto.studyDate),
+        studyDateTime: new Date(dto.studyDateTime),
         status: Status.Pending,
       });
 
@@ -99,7 +99,7 @@ export class StudyService {
       const [_, updatedRows] = await this.repository.update(
         {
           ...dto, 
-          studyDate: dto.studyDate ? new Date(dto.studyDate) : undefined,
+          studyDateTime: dto.studyDateTime ? new Date(dto.studyDateTime) : undefined,
         }, {
           where: {id}, 
           returning: true

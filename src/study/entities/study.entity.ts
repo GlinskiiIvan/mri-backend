@@ -6,7 +6,14 @@ import { Series } from "src/series/entities/series.entity";
 
 interface TableCreationAttrs {
     readonly patientId: number;
-    readonly studyDate: Date;
+    readonly studyInstanceUID: string;
+    readonly studyId?: string | null;
+    readonly institutionName?: string | null;
+    readonly manufacturer?: string | null;
+    readonly manufacturersModelName?: string | null;
+    readonly stationName?: string | null;
+    readonly referringPhysiciansName?: string | null;
+    readonly studyDateTime: Date;
     readonly modality: Modality;
     readonly description?: string;
     readonly status: Status;
@@ -30,9 +37,21 @@ export class Study extends Model<Study, TableCreationAttrs> {
     @BelongsTo(() => Patient)
     patient: Patient;
 
-    @ApiProperty({ example: '2026-03-27 15:05:29.277 +0600', description: 'Дата прохождения исследования' })
-    @Column({ type: DataType.DATE, })
-    studyDate: Date;
+    @ApiProperty({ example: '1.2.840.113619.2.312.6945.201972.14618.1691291532.417', description: 'Уникальный ID пациента' })
+    @Column({ type: DataType.STRING, unique: true, })
+    studyInstanceUID: string;
+
+    @ApiProperty({ example: '2345', description: 'Опциональный идентификатор исследования, присвоенный системой (Study ID)', required: false })
+    @Column({ type: DataType.STRING, allowNull: true, defaultValue: null, })
+    studyId?: string | null;
+
+    @ApiProperty({ example: 'ISO_IR 100', description: 'Кодировка символов, используемая в DICOM файле (Specific Character Set)', required: false })
+    @Column({ type: DataType.STRING, allowNull: true, defaultValue: null, })
+    specificCharacterSet?: string | null;
+
+    @ApiProperty({example: '2026-03-27T15:05:29.277+06:00', description: 'Дата и время прохождения исследования', })
+    @Column({type: DataType.DATE, })
+    studyDateTime: Date;
 
     @ApiProperty({ example: Modality.MR, description: 'Модальность исследования', enum: Object.values(Modality), })
     @Column({ type: DataType.ENUM(...Object.values(Modality)), })
@@ -42,7 +61,27 @@ export class Study extends Model<Study, TableCreationAttrs> {
     @Column({ type: DataType.STRING, allowNull: true, defaultValue: null })
     description?: string | null;
 
-    @ApiProperty({ example: Status.Completed, description: 'Статус', enum: Object.values(Status), })
+    @ApiProperty({ example: 'TESLA-MED', description: 'Название учреждения, где проводилось исследование (Institution Name)', required: false })
+    @Column({ type: DataType.STRING, allowNull: true, defaultValue: null, })
+    institutionName?: string | null;
+
+    @ApiProperty({ example: 'GE MEDICAL SYSTEMS', description: 'Производитель оборудования для исследования (Manufacturer)', required: false })
+    @Column({ type: DataType.STRING, allowNull: true, defaultValue: null, })
+    manufacturer?: string | null;
+
+    @ApiProperty({ example: 'Signa HDxt', description: 'Модель аппарата, использованного для исследования (Manufacturer\'s Model Name)', required: false })
+    @Column({ type: DataType.STRING, allowNull: true, defaultValue: null, })
+    manufacturersModelName?: string | null;
+
+    @ApiProperty({ example: 'GEHCGEHC', description: 'Имя станции (Station Name) или идентификатор сканера', required: false })
+    @Column({ type: DataType.STRING, allowNull: true, defaultValue: null, })
+    stationName?: string | null;
+
+    @ApiProperty({ example: '', description: 'Имя направившего врача (Referring Physician\'s Name)', required: false })
+    @Column({ type: DataType.STRING, allowNull: true, defaultValue: null, })
+    referringPhysiciansName?: string | null;
+
+    @ApiProperty({ example: Status.Processing, description: 'Статус', enum: Object.values(Status), })
     @Column({ type: DataType.ENUM(...Object.values(Status)), defaultValue: Status.Pending })
     status: Status;
 
@@ -63,3 +102,22 @@ export class Study extends Model<Study, TableCreationAttrs> {
     @HasMany(() => Series)
     series: Series[];
 }
+
+// (0020,000D) - Study Instance UID: 1.2.840.113619.2.312.6945.201972.14618.1691291532.417
+
+// (0008,0005) - Specific Character Set: ISO_IR 100
+
+// (0008,0020) - Study Date: 20230807
+// (0008,0030) - Study Time: 142115
+
+// (0008,0060) - Modality: MR
+
+// (0008,0080) - Institution Name: TESLA-MED
+
+// (0008,0070) - Manufacturer: GE MEDICAL SYSTEMS
+// (0008,1090) - Manufacturer's Model Name: Signa HDxt
+// (0008,1010) - Station Name: GEHCGEHC
+
+// (0008,0090) - Referring Physician's Name: 
+
+// (0008,1030) - Study Description: L-KNEE

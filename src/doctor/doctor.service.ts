@@ -17,12 +17,6 @@ export class DoctorService {
 
   private attributesModel = [];
 
-  private includeUser: Includeable = {
-    model: User,
-    as: 'user',
-    attributes: ['id', 'email'],
-  };
-
   private includePatients: Includeable = {
     model: Patient,
     as: 'patients',
@@ -68,9 +62,7 @@ export class DoctorService {
 
   async findOne(id: number) {
     try {
-      const doctor = await this.findOneOrThrow(id, {
-        include: [this.includeUser]
-      })
+      const doctor = await this.findOneOrThrow(id)
       return doctor;
     } catch (error) {
         const msg = `Ошибка при получении доктора по id. ${error.message}`;

@@ -26,12 +26,6 @@ export class UsersService {
     through: { attributes: [] },
   };
 
-  private includeDoctor: Includeable = {
-    model: Doctor,
-    as: 'doctor',
-    attributes: ['id', 'fullName'],
-  };
-
   async create(dto: CreateUserDto) {
     try {
       const user = await this.repository.create(dto);
@@ -88,9 +82,7 @@ export class UsersService {
 
   async findOne(id: number) {
     try {
-      const user = await this.findOneOrThrow(id, {
-        include: [this.includeDoctor],
-      });
+      const user = await this.findOneOrThrow(id);
       return user;
     } catch (error) {
         const msg = `Ошибка при получении пользователя по id. ${error.message}`;
@@ -103,7 +95,6 @@ export class UsersService {
     try {
       const user = await this.repository.findOne({
         where: { email },
-        include: [this.includeDoctor],
       });
       return user;
     } catch (error) {
