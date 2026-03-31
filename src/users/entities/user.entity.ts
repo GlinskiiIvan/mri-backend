@@ -4,12 +4,14 @@ import {
   Column,
   DataType,
   DeletedAt,
+  HasMany,
   HasOne,
   Model,
   Table,
 } from 'sequelize-typescript';
 import { Doctor } from 'src/doctor/entities/doctor.entity';
 import { UserRoles } from 'src/intermediary-tables/user-roles.entity';
+import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
 import { Role } from 'src/roles/entities/role.entity';
 
 interface TableCreationAttrs {
@@ -66,4 +68,8 @@ export class User extends Model<User, TableCreationAttrs> {
   // Связь один к одному с доктором
   @HasOne(() => Doctor)
   doctor?: Doctor;
+
+  // Связь один к одному с доктором
+  @HasMany(() => PredictionRun)
+  runs?: PredictionRun[];
 }

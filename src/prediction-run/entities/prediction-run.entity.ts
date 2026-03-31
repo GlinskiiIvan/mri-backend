@@ -4,6 +4,7 @@ import { Status } from "src/common/enums";
 import { Doctor } from "src/doctor/entities/doctor.entity";
 import { Prediction } from "src/prediction/entities/prediction.entity";
 import { Series } from "src/series/entities/series.entity";
+import { User } from "src/users/entities/user.entity";
 
 interface TableCreationAttrs {
     readonly seriesId: number;
@@ -29,13 +30,13 @@ export class PredictionRun extends Model<PredictionRun, TableCreationAttrs> {
 
     // Внешний ключ укзаывающий на создателя
     @ApiProperty({ example: 1, description: 'Уникальный ID того кто запустил предсказание' })
-    @ForeignKey(() => Doctor)
+    @ForeignKey(() => User)
     @Column({ type: DataType.INTEGER, })
     createdById: number;
 
     // alias для создателя
-    @BelongsTo(() => Doctor)
-    createdBy: Doctor;
+    @BelongsTo(() => User)
+    createdBy: User;
 
     @ApiProperty({ example: 'YOLO', description: 'Модель' })
     @Column({ type: DataType.STRING, })

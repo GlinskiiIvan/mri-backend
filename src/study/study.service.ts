@@ -5,7 +5,6 @@ import { Patient } from 'src/patient/entities/patient.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { Study } from './entities/study.entity';
 import { PatientService } from 'src/patient/patient.service';
-import { Status } from 'src/common/enums';
 import { Series } from 'src/series/entities/series.entity';
 import { FindOptions, Includeable } from 'sequelize';
 
@@ -17,11 +16,12 @@ export class StudyService {
   ) {}
 
   private attributesModel = [];
+
   private includePatient: Includeable = {
     model: Patient,
     as: 'patient',
-    attributes: ['id', 'fullName'],
   }
+
   private includeSeries: Includeable = {
     model: Series,
     as: 'series',

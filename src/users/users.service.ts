@@ -9,6 +9,7 @@ import { UserRoleDto } from './dto/user-role.dto';
 import { UserBanDto } from './dto/user-ban.dto';
 import { Doctor } from 'src/doctor/entities/doctor.entity';
 import { FindOptions, Includeable } from 'sequelize';
+import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
 
 @Injectable()
 export class UsersService {
@@ -24,6 +25,11 @@ export class UsersService {
     as: 'roles',
     attributes: ['id', 'value', 'description'],
     through: { attributes: [] },
+  };
+
+  private includeRuns: Includeable = {
+    model: PredictionRun,
+    as: 'runs',
   };
 
   async create(dto: CreateUserDto) {
@@ -111,7 +117,20 @@ export class UsersService {
       });
       return user.roles;
     } catch (error) {
-        const msg = `Ошибка при получении пользователя по id. ${error.message}`;
+        const msg = `Ошибка при получении всех ролей пользователя по id. ${error.message}`;
+        console.log(msg);
+        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findAllRuns(id: number) {
+    try {
+      const user = await this.findOneOrThrow(id, {
+        include: [this.includeRuns],
+      });
+      return user.runs;
+    } catch (error) {
+        const msg = `Ошибка при получении всех запусков предсказаний пользователя по id. ${error.message}`;
         console.log(msg);
         throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }

@@ -23,6 +23,7 @@ import { UserBanDto } from './dto/user-ban.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { Role } from 'src/roles/entities/role.entity';
+import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
 
 @ApiBearerAuth('token')
 @ApiTags('Пользователи')
@@ -73,6 +74,15 @@ export class UsersController {
   @Get(':id/roles')
   findAllRoles(@Param('id') id: string) {
     return this.usersService.findAllRoles(+id);
+  }
+
+  @ApiOperation({ summary: 'Получение всех запусков предсказаний пользователя по id' })
+  @ApiResponse({ status: 200, type: [PredictionRun] })
+  @Roles('admin')
+  @UseGuards(RolesGuard)
+  @Get(':id/runs')
+  findAllRuns(@Param('id') id: string) {
+    return this.usersService.findAllRuns(+id);
   }
 
   @ApiOperation({ summary: 'Бан пользователя' })
