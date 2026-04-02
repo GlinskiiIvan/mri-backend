@@ -12,7 +12,7 @@ import { UploadStudyDto } from './dto/upload-study.dto';
 export class IngestionController {
   constructor(private readonly ingestionService: IngestionService) {}
 
-  @ApiOperation({ summary: 'Создание доктора' })
+  @ApiOperation({ summary: 'Загрузка dicom архива (исследования)' })
   @ApiResponse({ status: 200, type: Boolean })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
