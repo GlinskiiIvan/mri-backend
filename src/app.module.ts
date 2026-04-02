@@ -30,6 +30,7 @@ import { PredictionModule } from './prediction/prediction.module';
 import { Prediction } from './prediction/entities/prediction.entity';
 import { InstanceImageModule } from './instance-image/instance-image.module';
 import { InstanceImage } from './instance-image/entities/instance-image.entity';
+import { IngestionModule } from './ingestion/ingestion.module';
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { InstanceImage } from './instance-image/entities/instance-image.entity';
     PredictionRunModule,
     PredictionModule,
     InstanceImageModule,
+    IngestionModule,
   ],
   controllers: [AppController],
   providers: [

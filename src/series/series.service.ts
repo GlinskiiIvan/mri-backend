@@ -9,6 +9,7 @@ import { Status } from 'src/common/enums';
 import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
 import { FindOptions, Includeable } from 'sequelize';
 import { InstanceImage } from 'src/instance-image/entities/instance-image.entity';
+import * as path from 'path';
 
 @Injectable()
 export class SeriesService {
@@ -35,8 +36,8 @@ export class SeriesService {
 
       const series = await this.repository.create(dto);
 
-      series.path = `${study.path}/series_${series.id}`;
-      series.save();
+      series.path = path.join(study.path, 'processed', `series_${series.id}`);
+      await series.save();
 
       return series;
     } catch (error) {

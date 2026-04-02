@@ -6,6 +6,7 @@ import { InstanceImage } from './entities/instance-image.entity';
 import { SeriesService } from 'src/series/series.service';
 import { FindOptions, Includeable } from 'sequelize';
 import { Prediction } from 'src/prediction/entities/prediction.entity';
+import * as path from 'path';
 
 @Injectable()
 export class InstanceImageService {
@@ -25,11 +26,10 @@ constructor(
     try {
       const series = await this.seriesService.findOneOrThrow(dto.seriesId);
 
-      const instance = await this.repository.create({
-        ...dto,
-        imagePath: `${series.path}/${dto.imageName}`,
-      });
-
+      const instance = await this.repository.create(dto);
+      instance.imagePath = path.join(series.path, dto.imageName);
+      await instance.save();
+      
       return instance;
     } catch (error) {
         const msg = `Ошибка при создании инстанса изображения. ${error.message}`;

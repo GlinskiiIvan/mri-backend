@@ -21,6 +21,7 @@ export enum Orientation {
   Axial = 'axial',
   Coronal = 'coronal',
   Sagittal = 'sagittal',
+  ObliqueCut = 'oblique cut',
 }
 
 export enum Protocol {

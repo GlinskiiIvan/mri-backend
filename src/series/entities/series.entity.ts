@@ -7,14 +7,6 @@ import { Study } from "src/study/entities/study.entity";
 
 interface TableCreationAttrs {
     readonly studyId: number;
-    readonly seriesNumber: string;
-    readonly modality: Modality;
-    readonly protocol: Protocol;
-    readonly orientation?: Orientation;
-    readonly imagesCount: number;
-    readonly rawMetadata: JSON;
-    readonly path: string;
-    readonly description?: string;
 }
 @Table({ tableName: 'series', paranoid: true })
 export class Series extends Model<Series, TableCreationAttrs> {
@@ -32,13 +24,13 @@ export class Series extends Model<Series, TableCreationAttrs> {
     @BelongsTo(() => Study)
     study: Study;
 
-    @ApiProperty({ example: 'SE000007', description: 'Номер серии' })
-    @Column({ type: DataType.STRING, })
-    seriesNumber: string;
+    @ApiProperty({ example: 'SE000007', description: 'Номер серии', required: false, })
+    @Column({ type: DataType.STRING, allowNull: true, defaultValue: null, })
+    seriesNumber?: string | null;
 
-    @ApiProperty({ example: Modality.MR, description: 'Модальность серии', enum: Object.values(Modality), })
-    @Column({ type: DataType.ENUM(...Object.values(Modality)), })
-    modality: Modality;
+    @ApiProperty({ example: Modality.MR, description: 'Модальность серии', enum: Object.values(Modality), required: false, })
+    @Column({ type: DataType.ENUM(...Object.values(Modality)), allowNull: true, defaultValue: null, })
+    modality?: Modality | null;
 
     @ApiProperty({ example: Protocol.PD, description: 'Протокол серии', enum: Object.values(Protocol), required: false, })
     @Column({ type: DataType.ENUM(...Object.values(Protocol)), allowNull: true, defaultValue: null, })
@@ -48,9 +40,9 @@ export class Series extends Model<Series, TableCreationAttrs> {
     @Column({ type: DataType.ENUM(...Object.values(Orientation)), allowNull: true, defaultValue: null, })
     orientation?: Orientation | null;
 
-    @ApiProperty({ example: 13, description: 'Количество снимков в серии', })
-    @Column({ type: DataType.INTEGER, })
-    imagesCount: number;
+    @ApiProperty({ example: 13, description: 'Количество снимков в серии', required: false, })
+    @Column({ type: DataType.INTEGER, allowNull: true, defaultValue: null, })
+    imagesCount?: number | null;
 
     @ApiProperty({
         example: {
@@ -62,9 +54,10 @@ export class Series extends Model<Series, TableCreationAttrs> {
             manufacturer: "Siemens",
         },
         description: 'Сырые метаданные серии (например, данные из DICOM: UID исследования, количество снимков, модальность, область исследования и оборудование)',
+        required: false,
     })
-    @Column({ type: DataType.JSONB, })
-    rawMetadata: JSON;
+    @Column({ type: DataType.JSONB, allowNull: true, defaultValue: null, })
+    rawMetadata?: JSON | null;
 
     @ApiProperty({ example: '/patient_{id}/study_{id}/series_{id}', description: 'Путь до директории со снимками серии', })
     @Column({ type: DataType.STRING, })

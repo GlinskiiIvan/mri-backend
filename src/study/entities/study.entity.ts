@@ -6,19 +6,6 @@ import { Series } from "src/series/entities/series.entity";
 
 interface TableCreationAttrs {
     readonly patientId: number;
-    readonly studyInstanceUID: string;
-    readonly studyId?: string | null;
-    readonly institutionName?: string | null;
-    readonly manufacturer?: string | null;
-    readonly manufacturersModelName?: string | null;
-    readonly stationName?: string | null;
-    readonly referringPhysiciansName?: string | null;
-    readonly studyDateTime: Date;
-    readonly modality: Modality;
-    readonly description?: string;
-    readonly path: string;
-    readonly seriesCount: number;
-    readonly imagesCount: number;
     readonly note?: string;
 }
 
@@ -39,8 +26,8 @@ export class Study extends Model<Study, TableCreationAttrs> {
     patient: Patient;
 
     @ApiProperty({ example: '1.2.840.113619.2.312.6945.201972.14618.1691291532.417', description: 'Уникальный ID пациента' })
-    @Column({ type: DataType.STRING, unique: true, })
-    studyInstanceUID: string;
+    @Column({ type: DataType.STRING, unique: true, allowNull: true, defaultValue: null, })
+    studyInstanceUID?: string | null;
 
     @ApiProperty({ example: '2345', description: 'Опциональный идентификатор исследования, присвоенный системой (Study ID)', required: false })
     @Column({ type: DataType.STRING, allowNull: true, defaultValue: null, })
@@ -51,12 +38,12 @@ export class Study extends Model<Study, TableCreationAttrs> {
     specificCharacterSet?: string | null;
 
     @ApiProperty({example: '2026-03-27T15:05:29.277+06:00', description: 'Дата и время прохождения исследования', })
-    @Column({type: DataType.DATE, })
-    studyDateTime: Date;
+    @Column({type: DataType.DATE, allowNull: true, defaultValue: null, })
+    studyDateTime?: Date | null;
 
     @ApiProperty({ example: Modality.MR, description: 'Модальность исследования', enum: Object.values(Modality), })
-    @Column({ type: DataType.ENUM(...Object.values(Modality)), })
-    modality: Modality;
+    @Column({ type: DataType.ENUM(...Object.values(Modality)), allowNull: true, defaultValue: null, })
+    modality?: Modality | null;
 
     @ApiProperty({ example: 'Представим, что это описание всего исследования.', description: 'Описание', required: false, })
     @Column({ type: DataType.STRING, allowNull: true, defaultValue: null })
@@ -87,16 +74,16 @@ export class Study extends Model<Study, TableCreationAttrs> {
     status: Status;
 
     @ApiProperty({ example: '/patient_{id}/study_{id}/', description: 'Путь до директории с сериями исследования', })
-    @Column({ type: DataType.STRING, })
-    path: string;
+    @Column({ type: DataType.STRING, allowNull: true, defaultValue: null, })
+    path?: string | null;
 
     @ApiProperty({ example: 5, description: 'Количество серий в исследовании', })
-    @Column({ type: DataType.INTEGER, })
-    seriesCount: number;
+    @Column({ type: DataType.INTEGER, allowNull: true, defaultValue: null, })
+    seriesCount?: number | null;
 
     @ApiProperty({ example: 5, description: 'Количество изображений в исследовании', })
-    @Column({ type: DataType.INTEGER, })
-    imagesCount: number;
+    @Column({ type: DataType.INTEGER, allowNull: true, defaultValue: null, })
+    imagesCount?: number | null;
 
     @ApiProperty({ example: 'Странные колени', description: 'Заметка', required: false, })
     @Column({ type: DataType.STRING, allowNull: true, defaultValue: null })

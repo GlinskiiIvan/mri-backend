@@ -101,6 +101,7 @@ export class UsersService {
     try {
       const user = await this.repository.findOne({
         where: { email },
+        include: [this.includeRoles],
       });
       return user;
     } catch (error) {

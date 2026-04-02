@@ -7,6 +7,7 @@ import { Study } from './entities/study.entity';
 import { PatientService } from 'src/patient/patient.service';
 import { Series } from 'src/series/entities/series.entity';
 import { FindOptions, Includeable } from 'sequelize';
+import * as path from 'path';
 
 @Injectable()
 export class StudyService {
@@ -31,13 +32,10 @@ export class StudyService {
     try {
       await this.patientServise.findOneOrThrow(dto.patientId);
 
-      const study = await this.repository.create({
-        ...dto, 
-        studyDateTime: new Date(dto.studyDateTime),
-      });
+      const study = await this.repository.create(dto);
 
-      study.path = `/patient_${dto.patientId}/study_${study.id}`;
-      study.save();
+      study.path = path.join('storage', `patient_${dto.patientId}`, `study_${study.id}`);
+      await study.save();
 
       return study;      
     } catch (error) {

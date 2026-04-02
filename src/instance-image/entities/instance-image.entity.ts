@@ -6,7 +6,7 @@ import { Series } from "src/series/entities/series.entity";
 interface TableCreationAttrs {
     readonly seriesId: number;
     readonly imageName: string;
-    readonly imagePath: string;
+    readonly instanceNumber: number;
     readonly rawMetadata: JSON;
 }
 
@@ -27,7 +27,7 @@ export class InstanceImage extends Model<InstanceImage, TableCreationAttrs> {
     series: Series;
 
     @ApiProperty({ example: '00005-dd5595a4.png', description: 'Название изображения' })
-    @Column({ type: DataType.STRING, unique: true })
+    @Column({ type: DataType.STRING })
     imageName: string;
 
     @ApiProperty({ example: '/patient_{id}/study_{id}/series_{id}/00005-dd5595a4.png', description: 'Путь до изображения' })
