@@ -14,7 +14,7 @@ export class CreatePredictionDto {
 
     @ApiProperty({ example: ResultClass.Tear, description: 'Класс', enum: Object.values(ResultClass), })
     @IsEnum(ResultClass, { message: `resultClass должн быть одним из значений: ${Object.values(ResultClass).join(', ')}` })
-    readonly resultClass: ResultClass;
+    readonly resultClass: ResultClass | null;
 
     @ApiProperty({ example: 0.97, description: 'Максимальная точность', required: false })
     @IsOptional()
@@ -25,6 +25,10 @@ export class CreatePredictionDto {
     @IsOptional()
     @IsNumber({}, { message: 'minConfidence должна быть числом' })
     readonly minConfidence?: number;
+
+    @ApiProperty({ example: 89, description: 'Время выполнения в ms', })
+    @IsNumber({}, { message: 'executionTime должно быть числом' })
+    executionTime: number;
 
     @ApiProperty({
         example: [

@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BelongsTo, Column, DataType, DeletedAt, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
 import { Modality, Status } from "src/common/enums";
 import { Patient } from "src/patient/entities/patient.entity";
+import { PredictionRun } from "src/prediction-run/entities/prediction-run.entity";
 import { Series } from "src/series/entities/series.entity";
 
 interface TableCreationAttrs {
@@ -97,6 +98,9 @@ export class Study extends Model<Study, TableCreationAttrs> {
     // Одно исследование — много серий
     @HasMany(() => Series)
     series: Series[];
+
+    @HasMany(() => PredictionRun)
+    runs: PredictionRun[];
 }
 
 // (0020,000D) - Study Instance UID: 1.2.840.113619.2.312.6945.201972.14618.1691291532.417

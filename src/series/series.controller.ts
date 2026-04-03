@@ -6,7 +6,6 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { Roles } from 'src/decorators/roles.decorator';
 import { Series } from './entities/series.entity';
 import { RolesGuard } from 'src/guards/roles.guard';
-import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
 import { InstanceImage } from 'src/instance-image/entities/instance-image.entity';
 
 @ApiBearerAuth('token')
@@ -40,15 +39,6 @@ export class SeriesController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.seriesService.findOne(+id);
-  }
-
-  @ApiOperation({ summary: 'Получение всех запусков предсказаний серии по id' })
-  @ApiResponse({ status: 200, type: [PredictionRun] })
-  @Roles('admin', 'doctor')
-  @UseGuards(RolesGuard)
-  @Get(':id/runs')
-  findAllRuns(@Param('id') id: string) {
-    return this.seriesService.findAllRuns(+id);
   }
 
   @ApiOperation({ summary: 'Получение всех изображений серии по id' })

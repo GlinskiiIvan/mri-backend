@@ -40,7 +40,9 @@ constructor(
 
   async findAll() {
     try {
-      return await this.repository.findAll();
+      return await this.repository.findAll({
+        order: [['instanceNumber', 'ASC']],
+      });
     } catch (error) {
         const msg = `Ошибка при получении всех инстансов изображений. ${error.message}`;
         console.log(msg);

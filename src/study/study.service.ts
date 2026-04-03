@@ -8,6 +8,7 @@ import { PatientService } from 'src/patient/patient.service';
 import { Series } from 'src/series/entities/series.entity';
 import { FindOptions, Includeable } from 'sequelize';
 import * as path from 'path';
+import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
 
 @Injectable()
 export class StudyService {
@@ -26,7 +27,14 @@ export class StudyService {
   private includeSeries: Includeable = {
     model: Series,
     as: 'series',
+    separate: true,
+    order: [['seriesNumber', 'ASC']],
   }
+
+  private includeRuns: Includeable = {
+    model: PredictionRun,
+    as: 'runs',
+  };
 
   async create(dto: CreateStudyDto) {
     try {
@@ -64,6 +72,19 @@ export class StudyService {
       return study.series;
     } catch (error) {
         const msg = `Ошибка при получении всех серий исследования по id. ${error.message}`;
+        console.log(msg);
+        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findAllRuns(id: number) {
+    try {
+      const study = await this.findOneOrThrow(id, {
+        include: [this.includeRuns],
+      });
+      return study.runs;
+    } catch (error) {
+        const msg = `Ошибка при получении всех запусков предсказаний исследования по id. ${error.message}`;
         console.log(msg);
         throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }

@@ -4,9 +4,6 @@ import { UpdateSeriesDto } from './dto/update-series.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Series } from './entities/series.entity';
 import { StudyService } from 'src/study/study.service';
-import { Study } from 'src/study/entities/study.entity';
-import { Status } from 'src/common/enums';
-import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
 import { FindOptions, Includeable } from 'sequelize';
 import { InstanceImage } from 'src/instance-image/entities/instance-image.entity';
 import * as path from 'path';
@@ -19,15 +16,12 @@ export class SeriesService {
   ) {}
 
   private attributesModel = [];
-  
-  private includeRuns: Includeable = {
-    model: PredictionRun,
-    as: 'runs',
-  };
 
   private includeImages: Includeable = {
     model: InstanceImage,
     as: 'images',
+    separate: true,
+    order: [['instanceNumber', 'ASC']],
   };
     
   async create(dto: CreateSeriesDto) {
@@ -49,22 +43,11 @@ export class SeriesService {
 
   async findAll() {
     try {
-      return await this.repository.findAll();
+      return await this.repository.findAll({
+        order: [['seriesNumber', 'ASC']]
+      });
     } catch (error) {
         const msg = `Ошибка при получении всех серий. ${error.message}`;
-        console.log(msg);
-        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  async findAllRuns(id: number) {
-    try {
-      const series = await this.findOneOrThrow(id, {
-        include: [this.includeRuns],
-      });
-      return series.runs;
-    } catch (error) {
-        const msg = `Ошибка при получении всех запусков предсказаний серии по id. ${error.message}`;
         console.log(msg);
         throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }

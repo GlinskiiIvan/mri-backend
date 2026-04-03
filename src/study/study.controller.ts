@@ -7,6 +7,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { Study } from './entities/study.entity';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { Series } from 'src/series/entities/series.entity';
+import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
 
 @ApiBearerAuth('token')
 @ApiTags('Исследование')
@@ -48,6 +49,15 @@ export class StudyController {
   @Get(':id/series')
   findAllSeries(@Param('id') id: string) {
     return this.studyService.findAllSeries(+id);
+  }
+
+  @ApiOperation({ summary: 'Получение всех запусков предсказаний исследования по id' })
+  @ApiResponse({ status: 200, type: [PredictionRun] })
+  @Roles('admin', 'doctor')
+  @UseGuards(RolesGuard)
+  @Get(':id/runs')
+  findAllRuns(@Param('id') id: string) {
+    return this.studyService.findAllRuns(+id);
   }
 
   @ApiOperation({ summary: 'Обновление исследования' })

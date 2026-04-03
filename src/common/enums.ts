@@ -34,3 +34,11 @@ export enum ResultClass {
   Normal = 'normal',
   Tear = 'tear',
 }
+
+export enum Models {
+  YOLO = 'YOLO',
+}
+
+export enum YOLOSizes {
+  
+}

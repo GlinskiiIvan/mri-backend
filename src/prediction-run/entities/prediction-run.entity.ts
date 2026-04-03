@@ -1,13 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BelongsTo, Column, DataType, DeletedAt, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
 import { Status } from "src/common/enums";
-import { Doctor } from "src/doctor/entities/doctor.entity";
 import { Prediction } from "src/prediction/entities/prediction.entity";
-import { Series } from "src/series/entities/series.entity";
+import { Study } from "src/study/entities/study.entity";
 import { User } from "src/users/entities/user.entity";
 
 interface TableCreationAttrs {
-    readonly seriesId: number;
+    readonly studyId: number;
     readonly createdById: number;
     readonly model: string;
     readonly version: string;
@@ -18,15 +17,15 @@ export class PredictionRun extends Model<PredictionRun, TableCreationAttrs> {
     @Column({ type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true, })
     id: number;
 
-    // Внешний ключ укзаывающий на серию
-    @ApiProperty({ example: 1, description: 'Уникальный ID серии' })
-    @ForeignKey(() => Series)
+    // Внешний ключ укзаывающий на исследование
+    @ApiProperty({ example: 1, description: 'Уникальный ID исследования' })
+    @ForeignKey(() => Study)
     @Column({ type: DataType.INTEGER, })
-    seriesId: number;
+    studyId: number;
 
-    // alias для серии
-    @BelongsTo(() => Series)
-    series: Series;
+    // alias для исследования
+    @BelongsTo(() => Study)
+    study: Study;
 
     // Внешний ключ укзаывающий на создателя
     @ApiProperty({ example: 1, description: 'Уникальный ID того кто запустил предсказание' })

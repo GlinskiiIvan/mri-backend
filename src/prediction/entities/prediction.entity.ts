@@ -8,9 +8,10 @@ import { BBox } from "src/types";
 interface TableCreationAttrs {
     readonly runId: number;
     readonly imageId: number;
-    readonly resultClass: ResultClass;
+    readonly resultClass: ResultClass | null;
     readonly maxConfidence?: number;
     readonly minConfidence?: number;
+    readonly executionTime: number;
     readonly rawOutput: JSON[];
 }
 
@@ -45,8 +46,8 @@ export class Prediction extends Model<Prediction, TableCreationAttrs> {
     status: Status;
 
     @ApiProperty({ example: ResultClass.Tear, description: 'Класс', enum: Object.values(ResultClass), })
-    @Column({ type: DataType.ENUM(...Object.values(ResultClass)), })
-    resultClass: ResultClass;
+    @Column({ type: DataType.ENUM(...Object.values(ResultClass)), allowNull: true, defaultValue: null, })
+    resultClass: ResultClass | null;
 
     @ApiProperty({ example: 0.97, description: 'Максимальная точность', required: false, })
     @Column({ type: DataType.FLOAT, allowNull: true, defaultValue: null, })
@@ -55,6 +56,10 @@ export class Prediction extends Model<Prediction, TableCreationAttrs> {
     @ApiProperty({ example: 0.89, description: 'Минимальная точность', required: false, })
     @Column({ type: DataType.FLOAT, allowNull: true, defaultValue: null, })
     minConfidence?: number | null;
+
+    @ApiProperty({ example: 89, description: 'Время выполнения в ms', })
+    @Column({ type: DataType.BIGINT, })
+    executionTime: number;
 
     @ApiProperty({
         example: [

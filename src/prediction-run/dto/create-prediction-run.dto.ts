@@ -2,9 +2,9 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsDateString, IsNumber, IsString } from "class-validator";
 
 export class CreatePredictionRunDto {
-    @ApiProperty({ example: 1, description: 'Уникальный ID серии' })
-    @IsNumber({}, { message: 'seriesId должен быть числом' })
-    readonly seriesId: number;
+    @ApiProperty({ example: 1, description: 'Уникальный ID исследования' })
+    @IsNumber({}, { message: 'studyId должен быть числом' })
+    readonly studyId: number;
 
     @ApiProperty({ example: 1, description: 'Уникальный ID того кто запустил предсказание' })
     @IsNumber({}, { message: 'createdById должен быть числом' })

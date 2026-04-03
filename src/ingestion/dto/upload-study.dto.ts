@@ -3,7 +3,7 @@ import { IsNumber, IsOptional, IsString } from "class-validator";
 
 export class UploadStudyDto {
     @ApiProperty({ example: 1, description: 'Уникальный ID пациента' })
-    @IsNumber({}, { message: 'patientId должен быть числом' })
+    // @IsNumber({}, { message: 'patientId должен быть числом' })
     readonly patientId: number;
 
     @ApiProperty({ example: 'Странные колени', description: 'Заметка', required: false, })

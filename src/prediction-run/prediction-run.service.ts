@@ -9,12 +9,13 @@ import { Doctor } from 'src/doctor/entities/doctor.entity';
 import { DoctorService } from 'src/doctor/doctor.service';
 import { Prediction } from 'src/prediction/entities/prediction.entity';
 import { FindOptions, Includeable } from 'sequelize';
+import { StudyService } from 'src/study/study.service';
 
 @Injectable()
 export class PredictionRunService {
   constructor(
     @InjectModel(PredictionRun) private repository: typeof PredictionRun,
-    private seriesServise: SeriesService,
+    private studyService: StudyService,
     private doctorServise: DoctorService,
   ) {}
 
@@ -27,7 +28,7 @@ export class PredictionRunService {
     
   async create(dto: CreatePredictionRunDto) {
     try {
-      await this.seriesServise.findOneOrThrow(dto.seriesId);
+      await this.studyService.findOneOrThrow(dto.studyId);
       await this.doctorServise.findOneOrThrow(dto.createdById);
 
       const run = await this.repository.create(dto);
