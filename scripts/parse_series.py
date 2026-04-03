@@ -87,6 +87,6 @@ def parse_series(main_directory):
 
 if len(sys.argv) > 2 and sys.argv[1] == 'parse_series':
     result = parse_series(sys.argv[2])
-    print(json.dumps(result))
+    print(json.dumps(result), flush=True)
 
 sys.stdout.flush()
