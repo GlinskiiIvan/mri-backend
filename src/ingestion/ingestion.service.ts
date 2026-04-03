@@ -10,6 +10,7 @@ import * as path from 'path';
 import { spawn } from 'child_process';
 import { Status } from 'src/common/enums';
 import { dicomDateToISO, getProrocolName, getSliceOrientation, getSliceOrientationFromSeriesDescription } from 'src/utils';
+import { Series } from 'src/series/entities/series.entity';
 
 @Injectable()
 export class IngestionService {
@@ -28,6 +29,8 @@ export class IngestionService {
             await unzip.Open.file(dicomZipPath)
                 .then(d => d.extract({path: outputDir, concurrency: 5}));
 
+            await this.fileService.remove(dicomZipPath);
+            
             return outputDir;
         } catch (error) {
             const msg = `Ошибка при распаковки архива. ${error.message}`;
@@ -132,12 +135,15 @@ export class IngestionService {
     }
 
     async processSeries(studyId: number, seriesList: Record<string, string[]>) {
+        let series: Series | null = null;
+
         try {
             let lastImageData;
             const allSeries = Object.keys(seriesList);
             for (const seriesImages of allSeries) {
-                const series = await this.seriesService.create({studyId});
+                series = await this.seriesService.create({studyId});
                 await this.seriesService.update(series.id, {status: Status.Processing})
+
                 const paths = seriesList[seriesImages];
                 const results = [];
                 
@@ -161,6 +167,9 @@ export class IngestionService {
             }
             return lastImageData;
         } catch (error) {
+            if(series) {
+                await this.seriesService.update(series.id, {status: Status.Failed});
+            }
             const msg = `Ошибка при обработке серии. ${error.message}`;
             console.log(msg);
             throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
@@ -168,12 +177,15 @@ export class IngestionService {
     }
 
     async processStudy(dto: UploadStudyDto, dicomZip: Express.Multer.File) {
+        let study: Study | null = null;
+
         try {
-            const study = await this.studyService.create({
+            study = await this.studyService.create({
                 patientId: dto.patientId,
                 note: dto.note,
             });
             await this.studyService.update(study.id, {status: Status.Processing});
+
             const studyDir = await this.extractArchive(study, dicomZip);
             const seriesList = await this.parseSeries(studyDir);
             const lastImageData = await this.processSeries(study.id, seriesList);
@@ -197,6 +209,9 @@ export class IngestionService {
                 imagesCount,
             });
         } catch (error) {
+            if(study) {
+                await this.studyService.update(study.id, {status: Status.Failed});
+            }
             const msg = `Ошибка при обработке исследования. ${error.message}`;
             console.log(msg);
             throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);

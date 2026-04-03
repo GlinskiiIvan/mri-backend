@@ -4,11 +4,12 @@ import { PredictionController } from './prediction.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Prediction } from './entities/prediction.entity';
 import { PredictionRunModule } from 'src/prediction-run/prediction-run.module';
+import { InstanceImageModule } from 'src/instance-image/instance-image.module';
 
 @Module({
   controllers: [PredictionController],
   providers: [PredictionService],
-  imports: [SequelizeModule.forFeature([Prediction]), PredictionRunModule],
+  imports: [SequelizeModule.forFeature([Prediction]), PredictionRunModule, InstanceImageModule],
   exports: [PredictionService],
 })
 export class PredictionModule {}

@@ -45,7 +45,7 @@ export class FilesService {
     }
   }
 
-  async remove(fileName: string, type: FileTypesEnum) {
+  async removeStatic(fileName: string, type: FileTypesEnum) {
     try {
       const file = path.resolve(
         __dirname,
@@ -67,9 +67,23 @@ export class FilesService {
     }
   }
 
-  async update(oldName: string, file, type: FileTypesEnum): Promise<string> {
+  async remove(path: string) {
     try {
-      await this.remove(oldName, type);
+      if (fs.existsSync(path)) {
+        fs.rmSync(path);
+      }
+      return path;
+    } catch (error) {
+      throw new HttpException(
+        'Ошибка удалении файла',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async updateStatic(oldName: string, file, type: FileTypesEnum): Promise<string> {
+    try {
+      await this.removeStatic(oldName, type);
       return await this.createStatic(file, type);
     } catch (error) {
       throw new HttpException(

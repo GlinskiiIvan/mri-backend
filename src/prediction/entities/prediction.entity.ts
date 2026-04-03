@@ -8,11 +8,6 @@ import { BBox } from "src/types";
 interface TableCreationAttrs {
     readonly runId: number;
     readonly imageId: number;
-    readonly resultClass: ResultClass | null;
-    readonly maxConfidence?: number;
-    readonly minConfidence?: number;
-    readonly executionTime: number;
-    readonly rawOutput: JSON[];
 }
 
 @Table({ tableName: 'prediction', paranoid: true })
@@ -45,9 +40,9 @@ export class Prediction extends Model<Prediction, TableCreationAttrs> {
     @Column({ type: DataType.ENUM(...Object.values(Status)), defaultValue: Status.Pending })
     status: Status;
 
-    @ApiProperty({ example: ResultClass.Tear, description: 'Класс', enum: Object.values(ResultClass), })
+    @ApiProperty({ example: ResultClass.Tear, description: 'Класс', enum: Object.values(ResultClass), required: false, })
     @Column({ type: DataType.ENUM(...Object.values(ResultClass)), allowNull: true, defaultValue: null, })
-    resultClass: ResultClass | null;
+    resultClass?: ResultClass | null;
 
     @ApiProperty({ example: 0.97, description: 'Максимальная точность', required: false, })
     @Column({ type: DataType.FLOAT, allowNull: true, defaultValue: null, })
@@ -57,9 +52,9 @@ export class Prediction extends Model<Prediction, TableCreationAttrs> {
     @Column({ type: DataType.FLOAT, allowNull: true, defaultValue: null, })
     minConfidence?: number | null;
 
-    @ApiProperty({ example: 89, description: 'Время выполнения в ms', })
-    @Column({ type: DataType.BIGINT, })
-    executionTime: number;
+    @ApiProperty({ example: 89, description: 'Время выполнения в ms', required: false, })
+    @Column({ type: DataType.BIGINT, allowNull: true, defaultValue: null, })
+    executionTime?: number | null;
 
     @ApiProperty({
         example: [
@@ -76,9 +71,10 @@ export class Prediction extends Model<Prediction, TableCreationAttrs> {
         ],
         description: 'Результаты работы модели. Поле является универсальным и может содержать произвольную JSON-структуру в зависимости от используемой модели (например, bounding boxes, сегментации, ключевые точки и др.). Конкретный формат определяется типом модели и её версией. В данном примере bbox представлен в формате { x: number; y: number; width: number; height: number; } в нормализованных координатах (0–1).',
         type: 'array',
+        required: false,
     })
-    @Column({ type: DataType.JSONB, })
-    rawOutput: JSON[];
+    @Column({ type: DataType.JSONB, allowNull: true, defaultValue: null, })
+    rawOutput?: JSON[] | null;
 
     @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата удаления', required: false, })
     @DeletedAt

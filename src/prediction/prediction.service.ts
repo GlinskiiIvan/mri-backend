@@ -6,12 +6,14 @@ import { Prediction } from './entities/prediction.entity';
 import { PredictionRunService } from 'src/prediction-run/prediction-run.service';
 import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
 import { FindOptions, Includeable } from 'sequelize';
+import { InstanceImageService } from 'src/instance-image/instance-image.service';
 
 @Injectable()
 export class PredictionService {
   constructor(
     @InjectModel(Prediction) private repository: typeof Prediction,
     private predictionRunService: PredictionRunService,
+    private instanceImageService: InstanceImageService,
   ) {}
 
   private attributesModel = [];
@@ -24,6 +26,7 @@ export class PredictionService {
   async create(dto: CreatePredictionDto) {
     try {
       await this.predictionRunService.findOneOrThrow(dto.runId);
+      await this.instanceImageService.findOneOrThrow(dto.imageId);
 
       const prediction = await this.repository.create(dto);
 

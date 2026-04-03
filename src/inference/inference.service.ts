@@ -40,8 +40,13 @@ export class InferenceService {
         for (const element of series) {
           const images = await this.seriesService.findAllImages(element.id);
           for (const img of images) {
-            console.log('img path', img.imagePath);
-            const prediction = await new Promise((resolve, reject) => {
+            const prediction = await this.predictionService.create({
+              runId: run.id,
+              imageId: img.id,
+            });
+            await this.predictionService.update(prediction.id, {status: Status.Processing});
+
+            const predictionResult = await new Promise((resolve, reject) => {
                 const python = spawn('python3', [
                     path.resolve(process.cwd(), 'scripts/predict.py'),
                     dto.model,
@@ -62,6 +67,7 @@ export class InferenceService {
 
                 python.on('close', (code) => {
                     if (code !== 0) {
+                        this.predictionService.update(prediction.id, {status: Status.Failed});
                         console.error('Python error:', stderr);
                         return reject(stderr);
                     }
@@ -70,13 +76,14 @@ export class InferenceService {
                         const parsed = JSON.parse(stdout);
                         resolve(parsed);
                     } catch (e) {
+                        this.predictionService.update(prediction.id, {status: Status.Failed});
                         console.error('Ошибка парсинга JSON:', stdout);
                         reject(e);
                     }
                 });
             });
             
-            const results = prediction['predictions'];
+            const results = predictionResult['predictions'];
             
             const isTear = results.some(r => r.class === ResultClass.Tear);
             const confidences = results.map(r => r.confidence);
@@ -85,14 +92,13 @@ export class InferenceService {
             const minConfidence = (results.length === 0) ? 0 : Math.min(...confidences);
             const maxConfidence = (results.length === 0) ? 0 : Math.max(...confidences);
 
-            await this.predictionService.create({
-              imageId: img.id,
-              runId: run.id,
+            await this.predictionService.update(prediction.id, {
+              status: Status.Completed,
               rawOutput: results,
               resultClass,
               minConfidence,
               maxConfidence,
-              executionTime: prediction['executionTime'],
+              executionTime: predictionResult['executionTime'],
             });
           }
         }
