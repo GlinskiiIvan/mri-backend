@@ -23,7 +23,7 @@ export class UsersService {
   private includeRoles: Includeable = {
     model: Role,
     as: 'roles',
-    attributes: ['id', 'value', 'description'],
+    attributes: ['id', 'value',],
     through: { attributes: [] },
   };
 

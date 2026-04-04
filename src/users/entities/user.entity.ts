@@ -56,6 +56,10 @@ export class User extends Model<User, TableCreationAttrs> {
   @Column({ type: DataType.STRING, allowNull: true, defaultValue: null, })
   banReason?: string | null;
 
+  @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJicm9keWdhQG1haWwucnUiLCJiYW5uZWQiOmZhbHNlLCJyb2xlcyI6W3siaWQiOjEsInZhbHVlIjoiYWRtaW4ifV0sImlhdCI6MTc3NTIxOTcyNywiZXhwIjoxNzc1ODI0NTI3fQ.W4H5UHtLeI4OdrvZ7_RQnLew2qIbpGujSCMkcOWPDR4', description: 'Refresh токен пользователя' })
+  @Column({ type: DataType.STRING, allowNull: true, defaultValue: null, })
+  refreshToken?: string | null;
+
   @ApiProperty({ example: '2026-03-27T16:00:00.000Z', description: 'Дата удаления', required: false })
   @DeletedAt
   @Column({ type: DataType.DATE, allowNull: true, defaultValue: null, })

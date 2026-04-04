@@ -2,6 +2,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -17,11 +18,38 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  private async generateToken(user: User) {
-    const payload = { id: user.id, email: user.email, roles: user.roles };
+  private readonly logger = new Logger(AuthService.name);
+
+  private getUserData(user: User) {
     return {
-      token: this.jwtService.sign(payload),
+      id: user.id,
+      email: user.email,
+      banned: user.banned,
+      roles: user.roles,
     };
+  }
+
+  private async generateTokens(user: User) {
+    const payload = this.getUserData(user);
+
+    return {
+      accessToken: this.jwtService.sign(payload, {
+        secret: process.env.ACCESS_SECRET,
+        expiresIn: '1h',
+      }),
+      refreshToken: this.jwtService.sign(payload, {
+        secret: process.env.REFRESH_SECRET,
+        expiresIn: '7d',
+      }),
+    };
+  }
+
+  private async updateRefreshToken(user: User) {
+    const tokens = await this.generateTokens(user);
+    const hashRefreshToken = await bcrypt.hash(tokens.refreshToken, 5);
+    await this.usersService.update(user.id, {refreshToken: hashRefreshToken});
+
+    return tokens;
   }
 
   async registration(userDto: CreateUserDto) {
@@ -39,7 +67,14 @@ export class AuthService {
       password: hashPassword,
     });
 
-    return this.generateToken(user);
+    const tokens = await this.updateRefreshToken(user);
+
+    const res = {
+      user: this.getUserData(user),
+      tokens,
+    };
+    this.logger.log(`Регистрация в системе: `, res);
+    return res;
   }
 
   private async validateUser(userDto: CreateUserDto) {
@@ -64,6 +99,60 @@ export class AuthService {
 
   async login(userDto: CreateUserDto) {
     const user = await this.validateUser(userDto);
-    return this.generateToken(user);
+
+    const tokens = await this.updateRefreshToken(user);
+
+    const res = {
+      user: this.getUserData(user),
+      tokens,
+    };
+    this.logger.log(`Вход в систему: `, res);
+    return res;
+  }
+
+  async logout(userId: number) {
+    const user = await this.usersService.findOne(userId);
+    await this.usersService.update(userId, {refreshToken: null});
+
+    this.logger.log(`Выход из системы: `, {id: user.id, email: user.email});
+    return true;
+  }
+
+  async refresh(refreshToken: string) {
+    console.log('refreshToken', refreshToken);
+    
+    if (!refreshToken) {
+      throw new UnauthorizedException('Нет refresh токена');
+    }
+
+    let userData: any;
+
+    try {
+      userData = this.jwtService.verify(refreshToken, {
+        secret: process.env.REFRESH_SECRET,
+      });
+    } catch (e) {
+      throw new UnauthorizedException('Неверный refresh токен');
+    }
+
+    const user = await this.usersService.findOne(userData.id);
+
+    const refreshTokenEquals = await bcrypt.compare(
+      refreshToken,
+      user.refreshToken,
+    );
+
+    if(!user || !refreshTokenEquals) {
+      throw new UnauthorizedException('Неверный refresh токен');
+    }
+
+    const tokens = await this.updateRefreshToken(user);
+
+    const res = {
+      user: this.getUserData(user),
+      tokens,
+    };
+    this.logger.log(`Refresh запрос: `, res);
+    return res;
   }
 }

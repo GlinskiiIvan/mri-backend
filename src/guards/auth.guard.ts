@@ -33,16 +33,18 @@ export class AuthGuard implements CanActivate {
 
       if (bearer !== 'Bearer' || !token) {
         throw new UnauthorizedException({
-          message: 'Пользователь не авторизован',
+          message: 'Пользователь не авторизован 1',
         });
       }
 
-      const user = this.jwtService.verify(token);
+      const user = this.jwtService.verify(token, {
+        secret: process.env.ACCESS_SECRET
+      });
       req.user = user;
       return true;
     } catch (error) {
       throw new UnauthorizedException({
-        message: 'Пользователь не авторизован',
+        message: 'Пользователь не авторизован 2',
       });
     }
   }
