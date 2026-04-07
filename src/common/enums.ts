@@ -39,6 +39,7 @@ export enum Models {
   YOLO = 'YOLO',
 }
 
-export enum YOLOSizes {
-  
+export enum SortOrder {
+  Asc = 'asc',
+  Desc = 'desc'
 }
