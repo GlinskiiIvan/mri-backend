@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { PatientService } from './patient.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
@@ -7,10 +7,12 @@ import { Patient } from './entities/patient.entity';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { Study } from 'src/study/entities/study.entity';
+import { buildFindAllParams } from 'src/utils';
+import { FindAllQueryDto } from 'src/utils/dto/findAllQuery.dto';
 
 @ApiBearerAuth('token')
 @ApiTags('Пациент')
-@Controller('patient')
+@Controller('patients')
 export class PatientController {
   constructor(private readonly patientService: PatientService) {}
 
@@ -28,8 +30,9 @@ export class PatientController {
   @Roles('admin', 'doctor')
   @UseGuards(RolesGuard)
   @Get()
-  findAll() {
-    return this.patientService.findAll();
+  findAll(@Query() query: FindAllQueryDto) {
+    const params = buildFindAllParams(query);
+    return this.patientService.findAll(params);
   }
 
   @ApiOperation({ summary: 'Получение пациента по id' })
