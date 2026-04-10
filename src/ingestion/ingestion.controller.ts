@@ -26,6 +26,9 @@ export class IngestionController {
                   type: 'string',
                   format: 'binary',
               },
+              note: {
+                  type: 'string',
+              },
           },
       },
   })
@@ -34,6 +37,8 @@ export class IngestionController {
   @UseInterceptors(FileInterceptor('dicomZip'))
   @Post('/upload/study')
   processStudy(@Body() dto: UploadStudyDto, @UploadedFile() dicomZip) {
-      return this.ingestionService.processStudy(dto, dicomZip)
+    console.log('UploadStudyDto', dto);
+    
+    return this.ingestionService.processStudy(dto, dicomZip)
   }
 }

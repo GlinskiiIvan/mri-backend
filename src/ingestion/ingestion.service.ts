@@ -191,7 +191,7 @@ export class IngestionService {
             const lastImageData = await this.processSeries(study.id, seriesList);
             const allSeries = Object.keys(seriesList);
             const imagesCount = allSeries.reduce((acc, uid) => acc + seriesList[uid].length, 0);
-
+            
             await this.studyService.update(study.id, {
                 status: Status.Completed,
                 studyInstanceUID: lastImageData['Study Instance UID'] || null,

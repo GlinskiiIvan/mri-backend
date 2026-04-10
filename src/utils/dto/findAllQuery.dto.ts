@@ -29,11 +29,13 @@ export class FindAllQueryDto {
   @IsDate({message: 'dateTo должна быть корректной датой в формате YYYY-MM-DD'})
   readonly dateTo?: Date;
 
+  @IsOptional()
   @Type(() => Number)
   @IsInt({ message: 'pageSize должно быть целым числом' })
   @Min(1)
   readonly pageSize!: number;
 
+  @IsOptional()
   @Type(() => Number)
   @IsInt({ message: 'page должно быть целым числом' })
   @Min(1)

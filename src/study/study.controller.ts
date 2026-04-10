@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { StudyService } from './study.service';
 import { CreateStudyDto } from './dto/create-study.dto';
 import { UpdateStudyDto } from './dto/update-study.dto';
@@ -8,6 +8,8 @@ import { Study } from './entities/study.entity';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { Series } from 'src/series/entities/series.entity';
 import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
+import { FindAllQueryDto } from 'src/utils/dto/findAllQuery.dto';
+import { buildFindAllParams } from 'src/utils';
 
 @ApiBearerAuth('token')
 @ApiTags('Исследование')
@@ -29,8 +31,9 @@ export class StudyController {
   @Roles('admin', 'doctor')
   @UseGuards(RolesGuard)
   @Get()
-  findAll() {
-    return this.studyService.findAll();
+  findAll(@Query() query: FindAllQueryDto) {
+    const params = buildFindAllParams(query);
+    return this.studyService.findAll(params);
   }
 
   @ApiOperation({ summary: 'Получение исследования по id' })

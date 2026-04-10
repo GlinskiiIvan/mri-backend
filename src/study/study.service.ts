@@ -9,6 +9,7 @@ import { Series } from 'src/series/entities/series.entity';
 import { FindOptions, Includeable } from 'sequelize';
 import * as path from 'path';
 import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
+import { buildOrder, buildResultData, buildWhere, FindAllServiceParams } from 'src/utils';
 
 @Injectable()
 export class StudyService {
@@ -53,10 +54,32 @@ export class StudyService {
     }
   }
 
-  async findAll() {
+  async findAll(params: FindAllServiceParams) {
     try {
-      const studies = await this.repository.findAll();
-      return studies;
+      const whereParams = buildWhere<Study>({
+        dateFrom: params.dateFrom,
+        dateTo: params.dateTo,
+        filterBy: params.filterBy,
+        filterValue: params.filterValue,
+      });
+      const orderParams = buildOrder({
+        sortBy: params.sortBy, 
+        sortOrder: params.sortOrder
+      });
+
+      const { rows: studies, count } = await this.repository.findAndCountAll({
+        where: whereParams,
+        order: orderParams,
+        limit: params.pageSize || undefined,
+        offset: params.offset || undefined,
+      });
+
+      return buildResultData<Study>({
+        rows: studies,
+        page: params.page,
+        limit: params.pageSize,
+        count,
+      });
     } catch (error) {
         const msg = `Ошибка при получении всех исследований. ${error.message}`;
         console.log(msg);
