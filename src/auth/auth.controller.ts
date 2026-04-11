@@ -37,8 +37,8 @@ export class AuthController {
     res.cookie('refreshToken', regData.tokens.refreshToken, {
       maxAge: 30*24*60*60*1000, 
       httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
+      secure: false,
+      sameSite: 'lax',
     });
     return res.json({
       user: regData.user,
@@ -68,8 +68,8 @@ export class AuthController {
     res.cookie('refreshToken', loginData.tokens.refreshToken, {
       maxAge: 30*24*60*60*1000, 
       httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
+      secure: false,
+      sameSite: 'lax',
     });
     return res.json({
       user: loginData.user,
@@ -98,8 +98,8 @@ export class AuthController {
     res.cookie('refreshToken', refreshData.tokens.refreshToken, {
       maxAge: 30*24*60*60*1000, 
       httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
+      secure: false,
+      sameSite: 'lax',
     });
     return res.json({
       user: refreshData.user,
@@ -115,8 +115,8 @@ export class AuthController {
     res.clearCookie('refreshToken', {
       maxAge: 30*24*60*60*1000, 
       httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
+      secure: false,
+      sameSite: 'lax',
     });
     return res.json(logoutData);
   }

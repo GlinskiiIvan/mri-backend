@@ -88,7 +88,9 @@ export class UsersService {
 
   async findOne(id: number) {
     try {
-      const user = await this.findOneOrThrow(id);
+      const user = await this.findOneOrThrow(id, {
+        include: [this.includeRoles],
+      });
       return user;
     } catch (error) {
         const msg = `Ошибка при получении пользователя по id. ${error.message}`;

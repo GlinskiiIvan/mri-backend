@@ -33,7 +33,7 @@ export class AuthGuard implements CanActivate {
 
       if (bearer !== 'Bearer' || !token) {
         throw new UnauthorizedException({
-          message: 'Пользователь не авторизован 1',
+          message: 'Пользователь не авторизован',
         });
       }
 
@@ -44,7 +44,7 @@ export class AuthGuard implements CanActivate {
       return true;
     } catch (error) {
       throw new UnauthorizedException({
-        message: 'Пользователь не авторизован 2',
+        message: 'Пользователь не авторизован',
       });
     }
   }
