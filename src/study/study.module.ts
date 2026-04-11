@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { StudyService } from './study.service';
 import { StudyController } from './study.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
@@ -8,7 +8,7 @@ import { PatientModule } from 'src/patient/patient.module';
 @Module({
   controllers: [StudyController],
   providers: [StudyService],
-  imports: [SequelizeModule.forFeature([Study]), PatientModule],
+  imports: [SequelizeModule.forFeature([Study]), forwardRef(() => PatientModule)],
   exports: [StudyService],
 })
 export class StudyModule {}

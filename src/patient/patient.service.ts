@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { InjectModel } from '@nestjs/sequelize';
@@ -8,12 +8,14 @@ import { Doctor } from 'src/doctor/entities/doctor.entity';
 import { Study } from 'src/study/entities/study.entity';
 import { FindOptions, Includeable, Op } from 'sequelize';
 import { buildOrder, buildResultData, buildWhere, FindAllServiceParams } from 'src/utils';
+import { StudyService } from 'src/study/study.service';
 
 @Injectable()
 export class PatientService {
   constructor(
     @InjectModel(Patient) private repository: typeof Patient,
-    private doctorService: DoctorService
+    private doctorService: DoctorService,
+    @Inject(forwardRef(() => StudyService)) private studyService: StudyService,
   ) {}
 
   private attributesModel = [];
@@ -79,13 +81,12 @@ export class PatientService {
     }
   }
 
-  async findAllStudies(id: number) {
+  async findAllStudies(id: number, params: FindAllServiceParams) {
     try {
-      const patient = await this.findOneOrThrow(id, {
-        include: [this.includeStudies],
-      });
-
-      return patient.studies;
+      const patient = await this.findOneOrThrow(id);
+      const studies = await this.studyService.findAllByPatientId(id, params);
+      
+      return studies;
     } catch (error) {
         const msg = `Ошибка при получении всех исследований пациента. ${error.message}`;
         console.log(msg);

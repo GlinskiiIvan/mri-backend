@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateStudyDto } from './dto/create-study.dto';
 import { UpdateStudyDto } from './dto/update-study.dto';
 import { Patient } from 'src/patient/entities/patient.entity';
@@ -15,7 +15,7 @@ import { buildOrder, buildResultData, buildWhere, FindAllServiceParams } from 's
 export class StudyService {
   constructor(
     @InjectModel(Study) private repository: typeof Study,
-    private patientServise: PatientService,
+    @Inject(forwardRef(() => PatientService)) private patientServise: PatientService,
   ) {}
 
   private attributesModel = [];
@@ -69,6 +69,39 @@ export class StudyService {
 
       const { rows: studies, count } = await this.repository.findAndCountAll({
         where: whereParams,
+        order: orderParams,
+        limit: params.pageSize || undefined,
+        offset: params.offset || undefined,
+      });
+
+      return buildResultData<Study>({
+        rows: studies,
+        page: params.page,
+        limit: params.pageSize,
+        count,
+      });
+    } catch (error) {
+        const msg = `Ошибка при получении всех исследований. ${error.message}`;
+        console.log(msg);
+        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
+    }
+  }
+
+    async findAllByPatientId(patientId: number, params: FindAllServiceParams) {
+    try {
+      const whereParams = buildWhere<Study>({
+        dateFrom: params.dateFrom,
+        dateTo: params.dateTo,
+        filterBy: params.filterBy,
+        filterValue: params.filterValue,
+      });
+      const orderParams = buildOrder({
+        sortBy: params.sortBy, 
+        sortOrder: params.sortOrder
+      });
+
+      const { rows: studies, count } = await this.repository.findAndCountAll({
+        where: {patientId, ...whereParams},
         order: orderParams,
         limit: params.pageSize || undefined,
         offset: params.offset || undefined,

@@ -49,8 +49,9 @@ export class PatientController {
   @Roles('admin', 'doctor')
   @UseGuards(RolesGuard)
   @Get(':id/studies')
-  findAllStudies(@Param('id') id: string) {
-    return this.patientService.findAllStudies(+id);
+  findAllStudies(@Param('id') id: string, @Query() query: FindAllQueryDto) {
+    const params = buildFindAllParams(query);
+    return this.patientService.findAllStudies(+id, params);
   }
 
   @ApiOperation({ summary: 'Обновление пациента' })
