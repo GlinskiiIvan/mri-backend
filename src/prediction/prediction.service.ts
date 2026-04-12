@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreatePredictionDto } from './dto/create-prediction.dto';
 import { UpdatePredictionDto } from './dto/update-prediction.dto';
 import { InjectModel } from '@nestjs/sequelize';
@@ -7,13 +7,16 @@ import { PredictionRunService } from 'src/prediction-run/prediction-run.service'
 import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
 import { FindOptions, Includeable } from 'sequelize';
 import { InstanceImageService } from 'src/instance-image/instance-image.service';
+import { buildOrder, buildResultData, buildWhere, FindAllServiceParams } from 'src/utils';
+import { InstanceImage } from 'src/instance-image/entities/instance-image.entity';
+import { Series } from 'src/series/entities/series.entity';
 
 @Injectable()
 export class PredictionService {
   constructor(
     @InjectModel(Prediction) private repository: typeof Prediction,
-    private predictionRunService: PredictionRunService,
-    private instanceImageService: InstanceImageService,
+    @Inject(forwardRef(() => PredictionRunService)) private predictionRunService: PredictionRunService,
+    @Inject(forwardRef(() => InstanceImageService)) private instanceImageService: InstanceImageService,
   ) {}
 
   private attributesModel = [];
@@ -21,6 +24,11 @@ export class PredictionService {
   private includeRun: Includeable = {
     model: PredictionRun,
     as: 'run',
+  }
+
+  private includeImage: Includeable = {
+    model: InstanceImage,
+    as: 'image',
   }
     
   async create(dto: CreatePredictionDto) {
@@ -43,6 +51,43 @@ export class PredictionService {
       return await this.repository.findAll();
     } catch (error) {
         const msg = `Ошибка при получении всех предсказаний. ${error.message}`;
+        console.log(msg);
+        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findAllByRunId(runId: number, params: FindAllServiceParams) {
+    try {
+      const { rows: studies, count } = await this.repository.findAndCountAll({
+        where: {runId},
+        limit: params.pageSize || undefined,
+        offset: params.offset || undefined,
+        include: [
+          {
+            model: InstanceImage,
+            as: 'image',
+            include: [
+              {
+                model: Series,
+                as: 'series',
+              },
+            ],
+          }
+        ],
+        order: [
+          [{ model: InstanceImage, as: 'image' }, { model: Series, as: 'series' }, 'seriesNumber', 'ASC'],
+          [{ model: InstanceImage, as: 'image' }, 'instanceNumber', 'ASC'],
+        ],
+      });
+
+      return buildResultData<Prediction>({
+        rows: studies,
+        page: params.page,
+        limit: params.pageSize,
+        count,
+      });
+    } catch (error) {
+        const msg = `Ошибка при получении всех предсказаний для запуска по id. ${error.message}`;
         console.log(msg);
         throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }

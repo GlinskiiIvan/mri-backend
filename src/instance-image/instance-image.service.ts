@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateInstanceImageDto } from './dto/create-instance-image.dto';
 import { UpdateInstanceImageDto } from './dto/update-instance-image.dto';
 import { InjectModel } from '@nestjs/sequelize';
@@ -12,7 +12,7 @@ import * as path from 'path';
 export class InstanceImageService {
 constructor(
     @InjectModel(InstanceImage) private repository: typeof InstanceImage,
-    private seriesService: SeriesService,
+    @Inject(forwardRef(() => SeriesService)) private seriesService: SeriesService,
   ) {}
 
   private attributesModel = [];

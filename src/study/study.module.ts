@@ -9,7 +9,11 @@ import { PredictionRunModule } from 'src/prediction-run/prediction-run.module';
 @Module({
   controllers: [StudyController],
   providers: [StudyService],
-  imports: [SequelizeModule.forFeature([Study]), forwardRef(() => PatientModule), forwardRef(() => PredictionRunModule)],
+  imports: [
+    SequelizeModule.forFeature([Study]), 
+    forwardRef(() => PatientModule), 
+    forwardRef(() => PredictionRunModule)
+  ],
   exports: [StudyService],
 })
 export class StudyModule {}

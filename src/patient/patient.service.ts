@@ -14,8 +14,8 @@ import { StudyService } from 'src/study/study.service';
 export class PatientService {
   constructor(
     @InjectModel(Patient) private repository: typeof Patient,
-    private doctorService: DoctorService,
     @Inject(forwardRef(() => StudyService)) private studyService: StudyService,
+    private doctorService: DoctorService,
   ) {}
 
   private attributesModel = [];

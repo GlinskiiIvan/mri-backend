@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { InstanceImageService } from './instance-image.service';
 import { InstanceImageController } from './instance-image.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
@@ -8,7 +8,10 @@ import { SeriesModule } from 'src/series/series.module';
 @Module({
   controllers: [InstanceImageController],
   providers: [InstanceImageService],
-  imports: [SequelizeModule.forFeature([InstanceImage]), SeriesModule],
+  imports: [
+    SequelizeModule.forFeature([InstanceImage]), 
+    forwardRef(() => SeriesModule),
+  ],
   exports: [InstanceImageService],
 })
 export class InstanceImageModule {}

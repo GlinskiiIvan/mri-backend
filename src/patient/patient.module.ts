@@ -9,7 +9,11 @@ import { StudyModule } from 'src/study/study.module';
 @Module({
   controllers: [PatientController],
   providers: [PatientService],
-  imports: [SequelizeModule.forFeature([Patient]), DoctorModule, forwardRef(() => StudyModule)],
+  imports: [
+    SequelizeModule.forFeature([Patient]), 
+    forwardRef(() => StudyModule),
+    DoctorModule,
+  ],
   exports: [PatientService],
 })
 export class PatientModule {}

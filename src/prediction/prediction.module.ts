@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PredictionService } from './prediction.service';
 import { PredictionController } from './prediction.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
@@ -9,7 +9,11 @@ import { InstanceImageModule } from 'src/instance-image/instance-image.module';
 @Module({
   controllers: [PredictionController],
   providers: [PredictionService],
-  imports: [SequelizeModule.forFeature([Prediction]), PredictionRunModule, InstanceImageModule],
+  imports: [
+    SequelizeModule.forFeature([Prediction]),
+    forwardRef(() => PredictionRunModule),
+    forwardRef(() => InstanceImageModule),
+  ],
   exports: [PredictionService],
 })
 export class PredictionModule {}

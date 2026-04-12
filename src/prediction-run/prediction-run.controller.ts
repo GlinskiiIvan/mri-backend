@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { PredictionRunService } from './prediction-run.service';
 import { CreatePredictionRunDto } from './dto/create-prediction-run.dto';
 import { UpdatePredictionRunDto } from './dto/update-prediction-run.dto';
@@ -7,6 +7,8 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { PredictionRun } from './entities/prediction-run.entity';
 import { Prediction } from 'src/prediction/entities/prediction.entity';
+import { FindAllQueryDto } from 'src/utils/dto/findAllQuery.dto';
+import { buildFindAllParams } from 'src/utils';
 
 @ApiBearerAuth('token')
 @ApiTags('Запуск предсказания')
@@ -46,8 +48,9 @@ export class PredictionRunController {
   @Roles('admin', 'doctor')
   @UseGuards(RolesGuard)
   @Get(':id/predictions')
-  findAllPredictions(@Param('id') id: string) {
-    return this.predictionRunService.findAllPredictions(+id);
+  findAllPredictions(@Param('id') id: string, @Query() query: FindAllQueryDto) {
+    const params = buildFindAllParams(query);
+    return this.predictionRunService.findAllPredictions(+id, params);
   }
 
   @ApiOperation({ summary: 'Обновление запуска предсказания' })

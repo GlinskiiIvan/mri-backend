@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateSeriesDto } from './dto/create-series.dto';
 import { UpdateSeriesDto } from './dto/update-series.dto';
 import { InjectModel } from '@nestjs/sequelize';
@@ -12,7 +12,7 @@ import * as path from 'path';
 export class SeriesService {
   constructor(
     @InjectModel(Series) private repository: typeof Series,
-    private studyServise: StudyService,
+    @Inject(forwardRef(() => StudyService)) private studyServise: StudyService,
   ) {}
 
   private attributesModel = [];
