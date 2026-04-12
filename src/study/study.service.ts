@@ -10,12 +10,14 @@ import { FindOptions, Includeable } from 'sequelize';
 import * as path from 'path';
 import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
 import { buildOrder, buildResultData, buildWhere, FindAllServiceParams } from 'src/utils';
+import { PredictionRunService } from 'src/prediction-run/prediction-run.service';
 
 @Injectable()
 export class StudyService {
   constructor(
     @InjectModel(Study) private repository: typeof Study,
     @Inject(forwardRef(() => PatientService)) private patientServise: PatientService,
+    @Inject(forwardRef(() => PredictionRunService)) private predictionRunService: PredictionRunService,
   ) {}
 
   private attributesModel = [];
@@ -133,12 +135,12 @@ export class StudyService {
     }
   }
 
-  async findAllRuns(id: number) {
+  async findAllRuns(id: number, params: FindAllServiceParams) {
     try {
-      const study = await this.findOneOrThrow(id, {
-        include: [this.includeRuns],
-      });
-      return study.runs;
+      const study = await this.findOneOrThrow(id);
+      const runs = await this.predictionRunService.findAllByStudyId(id, params);
+
+      return runs;
     } catch (error) {
         const msg = `Ошибка при получении всех запусков предсказаний исследования по id. ${error.message}`;
         console.log(msg);

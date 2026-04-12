@@ -59,8 +59,9 @@ export class StudyController {
   @Roles('admin', 'doctor')
   @UseGuards(RolesGuard)
   @Get(':id/runs')
-  findAllRuns(@Param('id') id: string) {
-    return this.studyService.findAllRuns(+id);
+  findAllRuns(@Param('id') id: string, @Query() query: FindAllQueryDto) {
+    const params = buildFindAllParams(query);
+    return this.studyService.findAllRuns(+id, params);
   }
 
   @ApiOperation({ summary: 'Обновление исследования' })

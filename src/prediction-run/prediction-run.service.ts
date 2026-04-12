@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreatePredictionRunDto } from './dto/create-prediction-run.dto';
 import { UpdatePredictionRunDto } from './dto/update-prediction-run.dto';
 import { InjectModel } from '@nestjs/sequelize';
@@ -10,13 +10,14 @@ import { DoctorService } from 'src/doctor/doctor.service';
 import { Prediction } from 'src/prediction/entities/prediction.entity';
 import { FindOptions, Includeable } from 'sequelize';
 import { StudyService } from 'src/study/study.service';
+import { buildOrder, buildResultData, buildWhere, FindAllServiceParams } from 'src/utils';
 
 @Injectable()
 export class PredictionRunService {
   constructor(
     @InjectModel(PredictionRun) private repository: typeof PredictionRun,
-    private studyService: StudyService,
     private doctorServise: DoctorService,
+    @Inject(forwardRef(() => StudyService)) private studyService: StudyService,
   ) {}
 
   private attributesModel = [];
@@ -43,6 +44,39 @@ export class PredictionRunService {
   async findAll() {
     try {
       return await this.repository.findAll();
+    } catch (error) {
+        const msg = `Ошибка при получении всех запусков предсказания. ${error.message}`;
+        console.log(msg);
+        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findAllByStudyId(studyId: number, params: FindAllServiceParams) {
+    try {
+      const whereParams = buildWhere<PredictionRun>({
+        dateFrom: params.dateFrom,
+        dateTo: params.dateTo,
+        filterBy: params.filterBy,
+        filterValue: params.filterValue,
+      });
+      const orderParams = buildOrder({
+        sortBy: params.sortBy, 
+        sortOrder: params.sortOrder
+      });
+
+      const { rows: studies, count } = await this.repository.findAndCountAll({
+        where: {studyId, ...whereParams},
+        order: orderParams,
+        limit: params.pageSize || undefined,
+        offset: params.offset || undefined,
+      });
+
+      return buildResultData<PredictionRun>({
+        rows: studies,
+        page: params.page,
+        limit: params.pageSize,
+        count,
+      });
     } catch (error) {
         const msg = `Ошибка при получении всех запусков предсказания. ${error.message}`;
         console.log(msg);

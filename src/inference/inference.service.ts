@@ -49,7 +49,7 @@ export class InferenceService {
             const predictionResult = await new Promise((resolve, reject) => {
                 const python = spawn('python3', [
                     path.resolve(process.cwd(), 'scripts/predict.py'),
-                    dto.model,
+                    'YOLO-bbox',
                     dto.version,
                     img.imagePath,
                 ]);
