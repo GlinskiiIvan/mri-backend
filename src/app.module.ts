@@ -63,11 +63,15 @@ import { InferenceModule } from './inference/inference.module';
     ServeStaticModule.forRoot(
       {
         rootPath: path.join(__dirname, '..', 'static', 'document'),
-        renderPath: '/document',
+        serveRoot: '/document',
       },
       {
         rootPath: path.join(__dirname, '..', 'static', 'image'),
-        renderPath: '/image',
+        serveRoot: '/image',
+      },
+      {
+        rootPath: path.join(__dirname, '..', 'storage'),
+        serveRoot: '/storage',
       },
     ),
     UsersModule,
