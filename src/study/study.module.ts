@@ -5,6 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Study } from './entities/study.entity';
 import { PatientModule } from 'src/patient/patient.module';
 import { PredictionRunModule } from 'src/prediction-run/prediction-run.module';
+import { InstanceImageModule } from 'src/instance-image/instance-image.module';
 
 @Module({
   controllers: [StudyController],
@@ -12,7 +13,8 @@ import { PredictionRunModule } from 'src/prediction-run/prediction-run.module';
   imports: [
     SequelizeModule.forFeature([Study]), 
     forwardRef(() => PatientModule), 
-    forwardRef(() => PredictionRunModule)
+    forwardRef(() => PredictionRunModule),
+    forwardRef(() => InstanceImageModule),
   ],
   exports: [StudyService],
 })

@@ -10,6 +10,7 @@ import { Series } from 'src/series/entities/series.entity';
 import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
 import { FindAllQueryDto } from 'src/utils/dto/findAllQuery.dto';
 import { buildFindAllParams } from 'src/utils';
+import { InstanceImage } from 'src/instance-image/entities/instance-image.entity';
 
 @ApiBearerAuth('token')
 @ApiTags('Исследование')
@@ -62,6 +63,16 @@ export class StudyController {
   findAllRuns(@Param('id') id: string, @Query() query: FindAllQueryDto) {
     const params = buildFindAllParams(query);
     return this.studyService.findAllRuns(+id, params);
+  }
+
+  @ApiOperation({ summary: 'Получение всех изображений исследования по id' })
+  @ApiResponse({ status: 200, type: [InstanceImage] })
+  @Roles('admin', 'doctor')
+  @UseGuards(RolesGuard)
+  @Get(':id/images')
+  findAllImages(@Param('id') id: string, @Query() query: FindAllQueryDto) {
+    const params = buildFindAllParams(query);
+    return this.studyService.findAllImages(+id, params);
   }
 
   @ApiOperation({ summary: 'Обновление исследования' })

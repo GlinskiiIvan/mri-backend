@@ -7,6 +7,8 @@ import { SeriesService } from 'src/series/series.service';
 import { FindOptions, Includeable } from 'sequelize';
 import { Prediction } from 'src/prediction/entities/prediction.entity';
 import * as path from 'path';
+import { buildResultData, FindAllServiceParams } from 'src/utils';
+import { Series } from 'src/series/entities/series.entity';
 
 @Injectable()
 export class InstanceImageService {
@@ -48,6 +50,34 @@ constructor(
         console.log(msg);
         throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async findAllByStudyId(studyId: number, params: FindAllServiceParams) {
+    const { rows, count } = await this.repository.findAndCountAll({
+      limit: params.pageSize || undefined,
+      offset: params.offset || undefined,
+
+      include: [
+        {
+          model: Series,
+          as: 'series',
+          required: true,
+          where: { studyId },
+        },
+      ],
+
+      order: [
+        [{ model: Series, as: 'series' }, 'seriesNumber', 'ASC'],
+        ['instanceNumber', 'ASC'],
+      ],
+    });
+
+    return buildResultData({
+      rows,
+      count,
+      page: params.page,
+      limit: params.pageSize,
+    });
   }
 
   async findOneOrThrow(id: number, options?: Omit<FindOptions<InstanceImage>, "where">) {

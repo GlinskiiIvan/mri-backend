@@ -11,6 +11,7 @@ import * as path from 'path';
 import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
 import { buildOrder, buildResultData, buildWhere, FindAllServiceParams } from 'src/utils';
 import { PredictionRunService } from 'src/prediction-run/prediction-run.service';
+import { InstanceImageService } from 'src/instance-image/instance-image.service';
 
 @Injectable()
 export class StudyService {
@@ -18,6 +19,7 @@ export class StudyService {
     @InjectModel(Study) private repository: typeof Study,
     @Inject(forwardRef(() => PatientService)) private patientServise: PatientService,
     @Inject(forwardRef(() => PredictionRunService)) private predictionRunService: PredictionRunService,
+    @Inject(forwardRef(() => InstanceImageService)) private instanceImageService: InstanceImageService,
   ) {}
 
   private attributesModel = [];
@@ -143,6 +145,19 @@ export class StudyService {
       return runs;
     } catch (error) {
         const msg = `Ошибка при получении всех запусков предсказаний исследования по id. ${error.message}`;
+        console.log(msg);
+        throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findAllImages(id: number, params: FindAllServiceParams) {
+    try {
+      const study = await this.findOneOrThrow(id);
+      const images = await this.instanceImageService.findAllByStudyId(id, params);
+
+      return images;
+    } catch (error) {
+        const msg = `Ошибка при получении всех изображений исследования по id. ${error.message}`;
         console.log(msg);
         throw new HttpException(msg, error.status || HttpStatus.BAD_REQUEST);
     }
