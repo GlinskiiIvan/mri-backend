@@ -15,7 +15,7 @@ export class PostsService {
 
   async create(req, createPostDto: CreatePostDto, image) {
     const { user } = req;
-    const fileName = await this.fileService.create(image, FileTypesEnum.image);
+    const fileName = await this.fileService.createStatic(image, FileTypesEnum.image);
     const post = await this.postRepository.create({
       ...createPostDto,
       userId: user.id,

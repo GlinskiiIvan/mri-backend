@@ -6,10 +6,7 @@ export class CreateRoleDto {
   @IsString({ message: 'Должно быть строкой' })
   readonly value: string;
 
-  @ApiProperty({
-    example: 'Роль обладающая полным доступом',
-    description: 'Описание роли',
-  })
+  @ApiProperty({ example: 'Роль обладающая полным доступом', description: 'Описание роли', })
   @IsString({ message: 'Должно быть строкой' })
   readonly description: string;
 }

@@ -2,6 +2,9 @@
 /dist
 /node_modules
 /build
+/storage
+/models
+/models/yolo/bbox/8x
 
 # Logs
 logs

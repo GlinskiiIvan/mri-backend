@@ -20,6 +20,7 @@ import {
 import { Role } from './entities/role.entity';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
+import { User } from 'src/users/entities/user.entity';
 
 @ApiBearerAuth('token')
 @ApiTags('Роли')
@@ -54,6 +55,15 @@ export class RolesController {
     return this.rolesService.findOne(+id);
   }
 
+  @ApiOperation({ summary: 'Получение всех пользователей роли по id' })
+  @ApiResponse({ status: 200, type: [User] })
+  @Roles('admin')
+  @UseGuards(RolesGuard)
+  @Get(':id/users')
+  findAllUsers(@Param('id') id: string) {
+    return this.rolesService.findAllUsers(+id);
+  }
+
   @ApiOperation({ summary: 'Обновление роли' })
   @ApiResponse({ status: 200, type: Role })
   @Roles('admin')
@@ -63,12 +73,30 @@ export class RolesController {
     return this.rolesService.update(+id, updateRoleDto);
   }
 
-  @ApiOperation({ summary: 'Удаление роли' })
-  @ApiResponse({ status: 200, type: Number })
+  @ApiOperation({ summary: 'Восстановление роли после мягкого удаления' })
+  @ApiResponse({ status: 200, type: Boolean })
+  @Roles('admin')
+  @UseGuards(RolesGuard)
+  @Patch(':id/restore')
+  restore(@Param('id') id: string) {
+    return this.rolesService.restore(+id);
+  }
+
+  @ApiOperation({ summary: 'Мягкое удаление роли' })
+  @ApiResponse({ status: 200, type: Boolean })
   @Roles('admin')
   @UseGuards(RolesGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.rolesService.remove(+id);
+  }
+
+  @ApiOperation({ summary: 'Жесткое удаление роли' })
+  @ApiResponse({ status: 200, type: Boolean })
+  @Roles('admin')
+  @UseGuards(RolesGuard)
+  @Delete(':id/force')
+  forceRemove(@Param('id') id: string) {
+    return this.rolesService.forceRemove(+id);
   }
 }
