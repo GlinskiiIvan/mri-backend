@@ -9,7 +9,7 @@ import { Study } from 'src/study/entities/study.entity';
 import * as path from 'path';
 import { spawn } from 'child_process';
 import { Status } from 'src/common/enums';
-import { dicomDateToISO, getProrocolName, getSliceOrientation, getSliceOrientationFromSeriesDescription } from 'src/utils';
+import { dicomDateToISO, getProrocolName, getPythonPath, getSliceOrientation, getSliceOrientationFromSeriesDescription } from 'src/utils';
 import { Series } from 'src/series/entities/series.entity';
 
 @Injectable()
@@ -41,8 +41,10 @@ export class IngestionService {
 
     async parseSeries(studyDir: string): Promise<Record<string, string[]>> {
         try {
+            const pythonPath = getPythonPath();
+
             return new Promise((resolve, reject) => {
-                const python = spawn('python3', [
+                const python = spawn(pythonPath, [
                     path.resolve(process.cwd(), 'scripts/parse_series.py'),
                     'parse_series',
                     studyDir,
@@ -83,8 +85,10 @@ export class IngestionService {
 
     async processInstanceImage(seriesId: number, dicomPath: string, outputDir: string) {
         try {
+            const pythonPath = getPythonPath();
+
             return new Promise((resolve, reject) => {
-                const python = spawn('python3', [
+                const python = spawn(pythonPath, [
                     path.resolve(process.cwd(), 'scripts/convert_image.py'),
                     'convert_dicom_to_png',
                     dicomPath,

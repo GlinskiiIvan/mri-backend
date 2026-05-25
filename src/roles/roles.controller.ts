@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -21,6 +22,8 @@ import { Role } from './entities/role.entity';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { User } from 'src/users/entities/user.entity';
+import { FindAllQueryDto } from 'src/utils/dto/findAllQuery.dto';
+import { buildFindAllParams } from 'src/utils';
 
 @ApiBearerAuth('token')
 @ApiTags('Роли')
@@ -42,8 +45,9 @@ export class RolesController {
   @Roles('admin')
   @UseGuards(RolesGuard)
   @Get()
-  findAll() {
-    return this.rolesService.findAll();
+  findAll(@Query() query: FindAllQueryDto) {
+    const params = buildFindAllParams(query);
+    return this.rolesService.findAll(params);
   }
 
   @ApiOperation({ summary: 'Получение роли по id' })

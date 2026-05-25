@@ -14,7 +14,7 @@ def YOLO_bbox(version: str, source: str):
             raise Exception(f"File not found: {source}")
 
         BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        modelPath = os.path.join(BASE_DIR, 'models', 'yolo', 'bbox', version, 'runs', 'detect', 'train', 'weights', 'best.pt')
+        modelPath = os.path.join(BASE_DIR, 'models', 'yolo', 'bbox', f'{version}.pt')
         
         model = YOLO(modelPath)
         results = model(source, verbose=False)

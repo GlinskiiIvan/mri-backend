@@ -10,6 +10,7 @@ import * as path from 'path';
 import { spawn } from 'child_process';
 import { PredictionService } from 'src/prediction/prediction.service';
 import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
+import { getPythonPath } from 'src/utils';
 
 @Injectable()
 export class InferenceService {
@@ -46,8 +47,10 @@ export class InferenceService {
             });
             await this.predictionService.update(prediction.id, {status: Status.Processing});
 
+            const pythonPath = getPythonPath();
+
             const predictionResult = await new Promise((resolve, reject) => {
-                const python = spawn('python3', [
+                const python = spawn(pythonPath, [
                     path.resolve(process.cwd(), 'scripts/predict.py'),
                     'YOLO-bbox',
                     dto.version,
