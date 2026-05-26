@@ -6,6 +6,7 @@ export {buildFindAllParams} from './buildFindAllParams';
 export {buildWhere} from './buildWhere';
 export {buildOrder} from './buildOrder';
 export {buildResultData} from './buildResultData';
+export {getPythonPath} from './getPythonPath';
 
 export type {GetTotalPagesParams} from './getTotalPages';
 export type {FindAllServiceParams} from './buildFindAllParams';

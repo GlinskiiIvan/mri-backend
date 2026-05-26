@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Role } from './entities/role.entity';
 import { User } from 'src/users/entities/user.entity';
 import { FindOptions, Includeable } from 'sequelize';
+import { buildOrder, buildResultData, buildWhere, FindAllServiceParams } from 'src/utils';
 
 @Injectable()
 export class RolesService {
@@ -35,9 +36,32 @@ export class RolesService {
     }
   }
 
-  async findAll() {
+  async findAll(params: FindAllServiceParams) {
     try {
-      return await this.repository.findAll();
+      const whereParams = buildWhere<Role>({
+        dateFrom: params.dateFrom,
+        dateTo: params.dateTo,
+        filterBy: params.filterBy,
+        filterValue: params.filterValue,
+      });
+      const orderParams = buildOrder({
+        sortBy: params.sortBy, 
+        sortOrder: params.sortOrder
+      });
+
+      const { rows: roles, count } = await this.repository.findAndCountAll({
+        where: whereParams,
+        order: orderParams,
+        limit: params.pageSize || undefined,
+        offset: params.offset || undefined,
+      });
+
+      return buildResultData<Role>({
+        rows: roles,
+        page: params.page,
+        limit: params.pageSize,
+        count,
+      });
     } catch (error) {
       const msg = `Ошибка при получении всех ролей. ${error.message}`;
       console.log(msg);

@@ -10,6 +10,7 @@ import { UserBanDto } from './dto/user-ban.dto';
 import { Doctor } from 'src/doctor/entities/doctor.entity';
 import { FindOptions, Includeable } from 'sequelize';
 import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
+import { buildOrder, buildResultData, buildWhere, FindAllServiceParams } from 'src/utils';
 
 @Injectable()
 export class UsersService {
@@ -68,9 +69,32 @@ export class UsersService {
     }
   }
 
-  async findAll() {
+  async findAll(params: FindAllServiceParams) {
     try {
-      return await this.repository.findAll();
+      const whereParams = buildWhere<User>({
+        dateFrom: params.dateFrom,
+        dateTo: params.dateTo,
+        filterBy: params.filterBy,
+        filterValue: params.filterValue,
+      });
+      const orderParams = buildOrder({
+        sortBy: params.sortBy, 
+        sortOrder: params.sortOrder
+      });
+
+      const { rows: users, count } = await this.repository.findAndCountAll({
+        where: whereParams,
+        order: orderParams,
+        limit: params.pageSize || undefined,
+        offset: params.offset || undefined,
+      });
+
+      return buildResultData<User>({
+        rows: users,
+        page: params.page,
+        limit: params.pageSize,
+        count,
+      });
     } catch (error) {
         const msg = `Ошибка при получении всех пользователей. ${error.message}`;
         console.log(msg);

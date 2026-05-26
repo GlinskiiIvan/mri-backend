@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -24,6 +25,8 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { Role } from 'src/roles/entities/role.entity';
 import { PredictionRun } from 'src/prediction-run/entities/prediction-run.entity';
+import { FindAllQueryDto } from 'src/utils/dto/findAllQuery.dto';
+import { buildFindAllParams } from 'src/utils';
 
 @ApiBearerAuth('token')
 @ApiTags('Пользователи')
@@ -54,8 +57,9 @@ export class UsersController {
   @Roles('admin')
   @UseGuards(RolesGuard)
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query() query: FindAllQueryDto) {
+    const params = buildFindAllParams(query);
+    return this.usersService.findAll(params);
   }
 
   @ApiOperation({ summary: 'Получение пользователя по id' })
